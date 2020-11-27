@@ -1,0 +1,44 @@
+{% extends '_base.html' %}
+
+{% block content %}
+<div class = 'formwrapper'>
+    <h2>Add New Periodical Source</h2>
+    <form action = "" method = "post">
+        <p>
+            {{ form.project.label }} <br>
+            {{ form.project }} <br>
+        </p>
+        <p>
+            {{ form.title.label }} <br>
+            {{ form.title }} <br>
+        </p>
+        {% include "people_form.html" %}
+        <p>
+            {{ form.journal.label }} <br>
+            {{ form.journal }} <br>
+        </p>
+        <p>
+            {{ form.volume.label }} <br>
+            {{ form.volume }} <br>
+        </p>
+        <p>
+            {{ form.issue.label }} <br>
+            {{ form.issue }} <br>
+        </p>
+        <p>
+            {{ form.month.label }} <br>
+            {{ form.month }} <br>
+        </p>
+        <p>
+            {{ form.year.label }} <br>
+            {{ form.year }} <br>
+        </p>
+        <p>
+            {{ form.description.label }} <br>
+            {{ form.description }}
+        </p>
+        <p> {{ form.submit }} </p>
+    </form>
+</div>
+
+{% endblock %}

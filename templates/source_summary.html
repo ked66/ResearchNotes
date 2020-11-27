@@ -1,0 +1,75 @@
+{% extends "_base.html" %}
+
+{% block content %}
+
+<h2>{{ info.title }}</h2>
+<div class="description">
+    <h3>Description:</h3>
+    <p>{{ source.description }}</p>
+</div>
+<div class="citation information">
+    <h3>Citation Information:</h3>
+    <p><b>Author(s): </b>
+    {{ authors[0] }}
+    {% for author in authors[1:] %}
+    , {{ author }}
+    {% endfor %}
+</p>
+<p><b>Editor(s): </b>
+    {{ editors[0] }}
+    {% for editor in editors[1:] %}
+    , {{ editor }}
+    {% endfor %}
+</p>
+<p><b>Translator(s): </b>
+    {{ translators[0] }}
+    {% for translator in translators[1:] %}
+    , {{ translator }}
+    {% endfor %}
+</p>
+    {% if source.source_type == 'book' %}
+        <p><b>Publisher: </b>{{ info.publisher }} ({{info.year}})</p>
+        <p><b>Edition: </b>{{ info.edition }}</p>
+        <p><b>Volume: </b>{{ info.volume }}</p>
+    {% endif %}
+    {% if source.source_type == 'periodical' %}
+        <p><b>Periodical: </b>{{ info.journal }}</p>
+        <p><b>Volume: </b>{{ info.volume }}</p>
+        <p><b>Issue: </b>{{ info.issue }}</p>
+        <p><b>Date: </b>{{ info.month }} {{ info.year }}</p>
+    {% endif %}
+    <p><a href = "/edit_source/{{ source.source_type }}/{{ info.source_id }}">Edit Citation Information</a></p>
+</div>
+
+<div class="notes">
+    <h3>Notes: </h3>
+    <ul>
+        {% for note in notes %}
+            <li>{{ note[0] }}
+            <form action="/delete/note/{{ note[1] }}" method="post">
+                <input type="submit" value="Delete Note" />
+            </form>
+            </li>
+        {% endfor %}
+    </ul>
+</div>
+<div class="formwrapper">
+    <h3>Add New Note:</h3>
+    <form action = "" method = "post">
+        <p>
+            {{ form.note.label }} <br>
+            {{ form.note }} <br>
+        </p>
+        <p>
+            {{ form.first_page.label}} <br>
+            {{ form.first_page }} through {{ form.last_page }} <br>
+        </p>
+        <p>
+            {{ form.topic.label }} <br>
+            {{ form.topic }} <br>
+        </p>
+        <p>{{ form.submit }}</p>
+    </form>
+</div>
+
+{% endblock %}

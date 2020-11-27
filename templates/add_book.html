@@ -1,0 +1,46 @@
+{% extends "_base.html" %}
+
+{% block content %}
+<div class="formwrapper">
+    {% if action == 'add' %}
+    <h2>Add New Book Source: </h2>
+    {% else %}
+    <h2>Edit Book Source: </h2>
+    {% endif %}
+
+    <form action = "" method = "post">
+        {{ form.hidden_tag() }}
+        <p>
+            {{ form.project.label }}<br>
+            {{ form.project }} <br>
+        </p>
+        <p>
+            {{ form.title.label }} <br>
+            {{ form.title }} <br>
+        </p>
+        {% include "people_form.html" %}
+        <p>
+            {{ form.publisher.label }} <br>
+            {{ form.publisher }} <br>
+        </p>
+        <p>
+            {{ form.year.label }} <br>
+            {{ form.year }} <br>
+        </p>
+        <p>
+            {{ form.edition.label }} <br>
+            {{ form.edition }} <br>
+        </p>
+        <p>
+            {{ form.volume.label }} <br>
+            {{ form.volume }} <br>
+        </p>
+        <p>
+            {{ form.description.label }} <br>
+            {{ form.description }} <br>
+        </p>
+        <p>{{ form.submit }}</p>
+    </form>
+</div>
+
+{% endblock %}

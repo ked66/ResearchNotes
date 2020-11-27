@@ -1,0 +1,25 @@
+{% extends "_base.html" %}
+
+{% block content %}
+
+<h2>{{ subtopic.name }}</h2>
+<p>{{ subtopic.description }}</p>
+
+{% for source in sources %}
+<h3>{{ source.citation|safe }}</h3>
+    <ul>
+        {% for note in notes %}
+            {% if note[1] == source.id %}
+            <li>{{ note[0] }}
+            <form action="/delete/subtopic_note/{{ subtopic.id }}/{{ note[2] }}" method="post">
+                <input type="submit" value="Remove Note from Subtopic" />
+            </form>
+            </li>
+            {% endif %}
+        {% endfor %}
+    </ul>
+{% endfor %}
+
+<p><a href="/project/{{ subtopic.project_id }}">Return to Project</a></p>
+
+{% endblock %}

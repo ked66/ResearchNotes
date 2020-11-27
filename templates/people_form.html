@@ -1,0 +1,32 @@
+        <p>
+            {{ form.person_type.label }} <br>
+            {{ form.person_type }}{{ form.person_first }} {{ form.person_middle }} {{ form.person_last }} <br>
+        </p>
+        <a href="javascript:showhide('second_person')">Click to Add/Remove 2nd Contributer</a>
+        <div id = "second_person" style="display:none;">
+            <p>
+                {{form.second_person_type}} {{ form.second_person_first }} {{ form.second_person_middle }}
+                {{ form.second_person_last }} <br>
+            </p>
+            <a href="javascript:showhide('third_person')">Click to Add/Remove 3rd Contributer</a>
+        </div>
+        <div id = "third_person" style="display:none;">
+            <p>
+                {{form.third_person_type}} {{ form.third_person_first }} {{ form.third_person_middle }}
+                {{ form.third_person_last }} <br>
+            </p>
+            <a href="javascript:showhide('fourth_person')">Click to Add/Remove 4th Contributer</a>
+        </div>
+        <div id = "fourth_person" style="display:none;">
+            <p>
+                {{ form.fourth_person_type }} {{ form.fourth_person_first }} {{ form.fourth_person_middle }}
+                {{ form.fourth_person_last }} <br>
+            </p>
+            <a href="javascript:showhide('fifth_person')">Click to Add/Remove 5th Contributer</a>
+        </div>
+        <div id = "fifth_person" style="display:none;">
+            <p>
+                {{form.fifth_person_type}} {{ form.fifth_person_first }} {{ form.fifth_person_middle }}
+                {{ form.fifth_person_last }} <br>
+            </p>
+        </div>

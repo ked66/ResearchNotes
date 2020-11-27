@@ -1,0 +1,43 @@
+{% extends '_base.html' %}
+
+{% block content %}
+
+<h2>{{ project_name }}</h2>
+<h3>Summary: </h3>
+<p>{{ project_summary }}</p>
+<h3>Sources: </h3>
+    <p><a href = '/project/add_source/book'>Add a Book Source</a></p>
+    <p><a href = '/project/add_source/periodical'>Add a Periodical Source</a></p>
+    <ul>
+        {% for source in sources %}
+        <li>{{ source.citation|safe }}  <a href = '/source/{{source.id}}'>View Details</a>
+            <form action = "/delete/source/{{source.id}}" method="post">
+                <input type="submit" value="Delete Source" />
+            </form>
+        </li>
+        {% endfor %}
+    </ul>
+<h3>Subtopics: </h3>
+    <ul>
+        {% for subtopic in subtopics %}
+        <li>{{ subtopic.name }}  <a href="/subtopic/{{subtopic.id}}">View Notes</a>
+            <form action="/delete/subtopic/{{ subtopic.id }}" method="post">
+                <input type="submit" value="Delete Subtopic" />
+            </form>
+</li>
+        {% endfor %}
+    </ul>
+<div class="formwrapper">
+    <h4>Add New Subtopic: </h4>
+    <form action = "" method = "post">
+        {{ form.hidden_tag() }}
+        <p>
+            {{ form.name.label }} <br>
+            {{ form.name }} <br>
+        </p>
+    <p>{{ form.submit }}</p>
+    </form>
+</div>
+<p><a href = '/projects'>Return to Projects List</a></p>
+
+{% endblock %}
