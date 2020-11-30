@@ -334,4 +334,66 @@ def edit_source_book(source_id):
 
     return render_template('add_book.html', form = form)
 
-# TODO: add edit periodical source information
+# edit periodical source information
+@app.route('/edit_source/periodical/<source_id>', methods = ["GET", "POST"])
+def edit_source_periodical(source_id):
+    periodical = Periodicals.query.get(source_id)
+    source = Sources.query.get(source_id)
+    project = db.session.query(Source_Project.project_id).filter(Source_Project.source_id == source_id).scalar()
+
+    # initialize form
+    form = PeriodicalForm()
+    form.project.choices = db.session.query(Projects.id, Projects.name).all()
+
+    # default form to existing information
+    form.project.default = project
+    form.title.default = periodical.title
+    form.journal.default = periodical.journal
+    form.volume.default = periodical.volume
+    form.issue.default = periodical.issue
+    form.month.default = periodical.month
+    form.year.default = periodical.year
+    form.description.default = source.description
+
+    # change submit button label
+    form.submit.label.text = "Save Changes"
+
+    # get lists of people, people_ids & set people defaults
+    people, people_id = set_people_defaults(form, source_id)
+
+    # save defaults
+    form.process()
+
+    if request.method == "POST":
+        # Initialize form with new inputs
+        form = PeriodicalForm()
+
+        # Update Book instance
+        db.session.query(Periodicals).filter(Periodicals.source_id == source_id).update(
+            {Periodicals.title: form.title.data,
+             Periodicals.journal: form.journal.data,
+             Periodicals.volume: form.volume.data,
+             Periodicals.issue: form.issue.data,
+             Periodicals.month: form.month.data,
+             Periodicals.year: form.year.data})
+        db.session.commit()
+
+        # Update People instances
+        authors, editors, translators = update_people(form, people, people_id, source_id)
+
+        # Generate citation & update Source instance
+        citation = mla_journal_citation(authors=authors,
+                                        title=form.title.data,
+                                        journal=form.journal.data,
+                                        volume=form.volume.data,
+                                        issue=form.issue.data,
+                                        month=form.month.data,
+                                        year=form.year.data)
+
+        db.session.query(Sources).filter(Sources.id == source_id).update({Sources.citation: citation})
+
+        db.session.commit()
+
+        return redirect(url_for('project', project_id=project))
+
+    return render_template('add_periodical.html', form=form)
