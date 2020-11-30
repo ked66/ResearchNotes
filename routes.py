@@ -1,10 +1,53 @@
-from forms import ProjectForm, BookForm, PeriodicalForm, SubtopicForm, NoteForm
+from forms import ProjectForm, BookForm, PeriodicalForm, SubtopicForm, NoteForm, \
+    RegistrationForm, SignInForm
 from models import *
-from app import app, db
+from app import app, db, login_manager
 from flask import render_template, request, redirect, url_for, flash
+from flask_login import login_user
 from sqlalchemy import func
 from citation_programs import mla_book, mla_journal_citation
 from helper_functions import get_form_people, sort_new_people, set_people_defaults, update_people
+
+# Define user_loader
+@login_manager.user_loader
+def load_user(user_id):
+  return Users.query.get(int(user_id))
+
+# Display registration form
+@app.route("/new_user", methods = ["GET", "POST"])
+def new_user():
+    form=RegistrationForm()
+
+    if request.method == "POST":
+        user = Users(name = form.name.data,
+                     email = form.email.data)
+        user.set_password(form.password.data)
+        db.session.add(user)
+        db.session.commit()
+
+        return redirect(url_for('projects'))
+
+    return render_template('user_registration.html', form=form)
+
+# Display Sign In form
+@app.route("/sign_in", methods = ["GET", "POST"])
+def sign_in():
+    form = SignInForm()
+
+    if request.method == "POST":
+        user = Users.query.filter_by(email=form.email.data).first()
+
+        if user and user.check_password(form.password.data):
+            login_user(user, remember = True)
+            next_page = request.args.get('next')
+            return redirect(next_page) if next_page else redirect(url_for('projects'))
+
+        else:
+            flash("Oops! Email or password incorrect!")
+            return redirect(url_for("sign_in"))
+
+    return render_template("sign_in.html", form=form)
+
 
 # Display list of current projects, add projects
 @app.route("/projects", methods=["GET", "POST"])

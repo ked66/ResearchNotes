@@ -1,5 +1,6 @@
 from flask import Flask, render_template
 from flask_sqlalchemy import SQLAlchemy
+from flask_login import LoginManager
 from os import environ
 
 # initialize app
@@ -11,6 +12,10 @@ app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 app.config['SECRET_KEY'] = 'secret'
 # create db file
 db = SQLAlchemy(app)
+
+# create login manager
+login_manager = LoginManager()
+login_manager.init_app(app)
 
 @app.route('/')
 def welcome():

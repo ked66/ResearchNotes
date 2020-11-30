@@ -1,5 +1,5 @@
 from flask_wtf import FlaskForm
-from wtforms import StringField, IntegerField, SubmitField, SelectField, SelectMultipleField, \
+from wtforms import StringField, IntegerField, SubmitField, SelectField, SelectMultipleField, PasswordField,\
     TextAreaField, validators, widgets
 from models import Projects, Topics
 from app import db
@@ -109,3 +109,18 @@ class NoteForm(FlaskForm):
     topic = MultiCheckboxField(label = "What subtopic(s) is this note related to?",
                         choices = [])
     submit = SubmitField(label = "Add Note")
+
+# registration form
+class RegistrationForm(FlaskForm):
+  name = StringField(label = 'Name', validators=[validators.DataRequired()])
+  email = StringField(label = 'Email', validators=[validators.DataRequired(), validators.Email()])
+  password = PasswordField(label = 'Password', validators=[validators.DataRequired()])
+  password2 = PasswordField(label = 'Confirm Password',
+                            validators = [validators.DataRequired(), validators.EqualTo('password')])
+  submit = SubmitField(label = 'Register')
+
+# sign-in form
+class SignInForm(FlaskForm):
+    email = StringField(label = "Email", validators = [validators.DataRequired()])
+    password = PasswordField(label = "Password", validators = [validators.DataRequired()])
+    submit = SubmitField(label = "SignIn")
