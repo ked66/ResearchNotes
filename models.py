@@ -80,7 +80,7 @@ class Topics(db.Model):
     id = db.Column(db.Integer, primary_key = True)
     name = db.Column(db.String(50))
     project_id = db.Column(db.Integer, db.ForeignKey('projects.id'))
-    topics_notes = db.relationship('Topics_Notes', cascade='all, delete-orphan')
+    topics_notes = db.relationship('Topics_Notes', cascade='all,delete-orphan')
     sqlite_autoincrement = True
 
 ## table of notes
@@ -90,7 +90,7 @@ class Notes(db.Model):
     first_page = db.Column(db.Integer)
     last_page = db.Column(db.Integer)
     note = db.Column(db.String)
-    topics_notes = db.relationship('Topics_Notes', cascade='all, delete-orphan')
+    topics_notes = db.relationship('Topics_Notes', cascade='all,delete-orphan')
     sqlite_autoincrement = True
 
     ## representation method - include page number(s) if given
