@@ -7,7 +7,9 @@ boto3==1.9.28
 botocore==1.12.28
 bz2file==0.98
 certifi==2018.8.24
+cffi==1.14.4
 click==7.1.2
+cryptography==3.2.1
 docutils==0.14
 Flask==1.1.2
 Flask-SQLAlchemy==2.4.4
@@ -17,7 +19,9 @@ itsdangerous==1.1.0
 Jinja2==2.11.2
 jmespath==0.9.3
 MarkupSafe==1.1.1
+psycopg2-binary==2.8.6
 pycparser==2.19
+pyOpenSSL==20.0.0
 python-dateutil==2.7.3
 s3transfer==0.1.13
 six==1.11.0
