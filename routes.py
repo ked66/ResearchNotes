@@ -225,7 +225,8 @@ def subtopic(subtopic_id):
 @app.route('/delete/subtopic/<id>', methods = ["POST"])
 def delete_subtopic(id):
     project_id = db.session.query(Topics.project_id).filter(Topics.id == id).scalar()
-    db.session.query(Topics).filter(Topics.id == id).delete()
+    topic = db.session.query(Topics).filter(Topics.id == id).first()
+    db.session.delete(topic)
     db.session.commit()
 
     flash("Subtopic Deleted!")
@@ -236,7 +237,8 @@ def delete_subtopic(id):
 @app.route('/delete/note/<id>', methods = ["POST"])
 def delete_note(id):
     source_id = db.session.query(Notes.source_id).filter(Notes.id == id).scalar()
-    db.session.query(Notes).filter(Notes.id == id).delete()
+    note = db.session.query(Notes).filter(Notes.id == id).first()
+    db.session.delete(note)
     db.session.commit()
 
     flash("Note Deleted!")
@@ -246,8 +248,9 @@ def delete_note(id):
 # Remove Note from Subtopic
 @app.route('/delete/subtopic_note/<subtopic_id>/<note_id>', methods = ["POST"])
 def delete_subtopic_note(subtopic_id, note_id):
-    db.session.query(Topics_Notes).filter(Topics_Notes.topic_id == subtopic_id and
-                                          Topics_Notes.note_id == note_id).delete()
+    topic_note = db.session.query(Topics_Notes).filter(Topics_Notes.topic_id == subtopic_id).\
+        filter(Topics_Notes.note_id == note_id).first()
+    db.session.delete(topic_note)
     db.session.commit()
 
     flash("Note removed from Subtopic!")
