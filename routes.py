@@ -4,7 +4,7 @@ from app import app, db
 from flask import render_template, request, redirect, url_for, flash
 from sqlalchemy import func
 from citation_programs import mla_book, mla_journal_citation
-from helper_functions import get_form_people, sort_new_people, set_people_defaults
+from helper_functions import get_form_people, sort_new_people, set_people_defaults, update_people
 
 # Display list of current projects, add projects
 @app.route("/projects", methods=["GET", "POST"])
@@ -312,45 +312,7 @@ def edit_source_book(source_id):
         db.session.commit()
 
         # Update People instances
-        # list of people from form
-        new_people = get_form_people(form)
-        authors = []
-        editors = []
-        translators = []
-
-        for person in new_people:
-            if person not in people and (person[0] or person[1] or person[2]):
-                # if new person didn't already exist, add People instance
-                add_person = People(first = person[0] if isinstance(person[0], str) else "",
-                                    middle = person[1] if isinstance(person[1], str) else "",
-                                    last = person[2] if isinstance(person[2], str) else "")
-                db.session.add(add_person)
-                db.session.commit()
-
-                if person[3] == 'author': authors.append(add_person.__repr__())
-                if person[3] == 'editor': editors.append(add_person.__repr__())
-                if person[3] == 'translator': translators.append(add_person.__repr__())
-
-                # and People_Source instance
-                add_person_id = db.session.query(func.max(People.id)).scalar()
-                add_people_source = People_Source(source_id=source_id,
-                                                  people_id=add_person_id,
-                                                  type=person[3])
-
-                db.session.add(add_people_source)
-                db.session.commit()
-
-        for i in range(len(people)):
-            if people[i] in new_people:
-                person = str(People.query.filter(People.id == people_id[i]).first())
-                if people[i][3] == 'author': authors.append(person)
-                if people[i][3] == 'editor': editors.append(person)
-                if people[i][3] == 'translator': translators.append(person)
-            # if person is no longer in citation, remove from People_Source from db
-            else:
-                People_Source.query.filter(People_Source.people_id == people_id[i]).\
-                    filter(People_Source.source_id == source_id).delete()
-                db.session.commit()
+        authors, editors, translators = update_people(form, people, people_id, source_id)
 
         # Generate citation & update Source instance
         citation = mla_book(authors = authors,

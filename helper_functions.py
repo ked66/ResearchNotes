@@ -91,3 +91,50 @@ def set_people_defaults(form, source_id):
                         form.fifth_person_type.default = people[4][3]
 
     return people, people_id
+
+# function to update people records from edit form
+def update_people(form, people, people_id, source_id):
+    # list of people from form
+    new_people = get_form_people(form)
+
+    # empty lists of authors, editors, translators
+    authors = []
+    editors = []
+    translators = []
+
+    # loop through new people
+    for person in new_people:
+        if person not in people and (person[0] or person[1] or person[2]):
+            # if new person didn't already exist, add People instance
+            add_person = People(first=person[0] if isinstance(person[0], str) else "",
+                                middle=person[1] if isinstance(person[1], str) else "",
+                                last=person[2] if isinstance(person[2], str) else "")
+            db.session.add(add_person)
+            db.session.commit()
+
+            if person[3] == 'author': authors.append(add_person.__repr__())
+            if person[3] == 'editor': editors.append(add_person.__repr__())
+            if person[3] == 'translator': translators.append(add_person.__repr__())
+
+            # and People_Source instance
+            add_person_id = db.session.query(func.max(People.id)).scalar()
+            add_people_source = People_Source(source_id=source_id,
+                                              people_id=add_person_id,
+                                              type=person[3])
+
+            db.session.add(add_people_source)
+            db.session.commit()
+
+    for i in range(len(people)):
+        if people[i] in new_people:
+            person = str(People.query.filter(People.id == people_id[i]).first())
+            if people[i][3] == 'author': authors.append(person)
+            if people[i][3] == 'editor': editors.append(person)
+            if people[i][3] == 'translator': translators.append(person)
+        # if person is no longer in citation, remove from People_Source from db
+        else:
+            People_Source.query.filter(People_Source.people_id == people_id[i]). \
+                filter(People_Source.source_id == source_id).delete()
+            db.session.commit()
+
+    return authors, editors, translators
