@@ -83,13 +83,13 @@ def projects(user_id):
         return redirect(url_for("welcome"))
 
 # Display summary of given project
-@app.route('/<user_id>/project/<project_id>', methods = ["GET", "POST"])
+@app.route('/project/<project_id>', methods = ["GET", "POST"])
 @login_required
-def project(user_id, project_id):
-    if current_user.get_id() == user_id:
-        # query current project from Projects
-        current_project = Projects.query.filter_by(id=project_id).first()
+def project(project_id):
+    # query current project from Projects
+    current_project = Projects.query.filter_by(id=project_id).first()
 
+    if int(current_user.get_id()) == current_project.user_id:
         # query current project from Source_Project (to get source ids)
         project_sources = db.session.query(Source_Project.source_id).filter(Source_Project.project_id==project_id).all()
         # format source ids as a list
@@ -167,7 +167,7 @@ def add_book():
         db.session.query(Sources).filter(Sources.id == new_source_id).update({Sources.citation: citation})
         db.session.commit()
 
-        return redirect(url_for('project', project_id = form.project.data, user_id = current_user.get_id()))
+        return redirect(url_for('project', project_id = form.project.data))
 
     return render_template('add_book.html', form = form, action = "add")
 
@@ -215,7 +215,7 @@ def add_periodical():
         db.session.query(Sources).filter(Sources.id == new_source_id).update({Sources.citation: citation})
         db.session.commit()
 
-        return redirect(url_for('project', project_id = form.project.data, user_id = current_user.get_id()))
+        return redirect(url_for('project', project_id = form.project.data))
 
     return render_template('add_periodical.html', form = form)
 
