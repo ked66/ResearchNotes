@@ -3,7 +3,7 @@ from forms import ProjectForm, BookForm, PeriodicalForm, SubtopicForm, NoteForm,
 from models import *
 from app import app, db, login_manager
 from flask import render_template, request, redirect, url_for, flash
-from flask_login import login_user
+from flask_login import login_user, login_required, logout_user
 from sqlalchemy import func
 from citation_programs import mla_book, mla_journal_citation
 from helper_functions import get_form_people, sort_new_people, set_people_defaults, update_people
@@ -25,7 +25,7 @@ def new_user():
         db.session.add(user)
         db.session.commit()
 
-        return redirect(url_for('projects'))
+        return redirect(url_for('projects', user_id = user.id))
 
     return render_template('user_registration.html', form=form)
 
@@ -40,7 +40,7 @@ def sign_in():
         if user and user.check_password(form.password.data):
             login_user(user, remember = True)
             next_page = request.args.get('next')
-            return redirect(next_page) if next_page else redirect(url_for('projects'))
+            return redirect(next_page) if next_page else redirect(url_for('projects', user_id = user.id))
 
         else:
             flash("Oops! Email or password incorrect!")
@@ -48,24 +48,34 @@ def sign_in():
 
     return render_template("sign_in.html", form=form)
 
+# Logout
+@app.route("/logout")
+@login_required
+def logout():
+    logout_user()
+    flash("Okay, logged out!")
+    return redirect(url_for('welcome'))
 
 # Display list of current projects, add projects
-@app.route("/projects", methods=["GET", "POST"])
-def projects():
+@app.route("/<user_id>/projects", methods=["GET", "POST"])
+@login_required
+def projects(user_id):
     # form to add projects
     form=ProjectForm()
     if request.method=='POST' and form.validate():
         new_project=Projects(name=form.name.data,
-                               summary=form.summary.data)
+                             summary=form.summary.data,
+                             user_id = user_id)
         db.session.add(new_project)
         db.session.commit()
 
     # query all current projects
-    current_projects = Projects.query.all()
+    current_projects = Projects.query.filter(Projects.user_id == user_id).all()
 
     return render_template('projects_list.html',
                            current_projects = current_projects,
-                           form = form)
+                           form = form,
+                           user = load_user(user_id))
 
 # Display summary of given project
 @app.route('/project/<project_id>', methods = ["GET", "POST"])
