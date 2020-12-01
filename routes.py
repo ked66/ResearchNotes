@@ -120,12 +120,16 @@ def project(user_id, project_id):
 
 # Add source type book
 @app.route('/project/add_source/book', methods=["GET", "POST"])
+@login_required
 def add_book():
     form = BookForm()
-    form.project.choices = db.session.query(Projects.id, Projects.name).all()
+    form.project.choices = db.session.query(Projects.id, Projects.name).\
+        filter(Projects.user_id == current_user.get_id()).all()
+
     if request.method == 'POST':
         new_source = Sources(description = form.description.data,
-                             source_type = 'book')
+                             source_type = 'book',
+                             user_id = current_user.get_id())
         db.session.add(new_source)
         db.session.commit()
 
@@ -163,18 +167,21 @@ def add_book():
         db.session.query(Sources).filter(Sources.id == new_source_id).update({Sources.citation: citation})
         db.session.commit()
 
-        return redirect(url_for('project', project_id = form.project.data))
+        return redirect(url_for('project', project_id = form.project.data, user_id = current_user.get_id()))
 
     return render_template('add_book.html', form = form, action = "add")
 
 # Add source type periodical
 @app.route('/project/add_source/periodical', methods=["GET", "POST"])
+@login_required
 def add_periodical():
     form = PeriodicalForm()
-    form.project.choices = db.session.query(Projects.id, Projects.name).all()
+    form.project.choices = db.session.query(Projects.id, Projects.name).\
+        filter(Projects.user_id == current_user.get_id()).all()
     if request.method == "POST":
         new_source = Sources(description=form.description.data,
-                             source_type='periodical')
+                             source_type='periodical',
+                             user_id = current_user.get_id())
         db.session.add(new_source)
         db.session.commit()
 
@@ -208,7 +215,7 @@ def add_periodical():
         db.session.query(Sources).filter(Sources.id == new_source_id).update({Sources.citation: citation})
         db.session.commit()
 
-        return redirect(url_for('project', project_id = form.project.data))
+        return redirect(url_for('project', project_id = form.project.data, user_id = current_user.get_id()))
 
     return render_template('add_periodical.html', form = form)
 
@@ -218,57 +225,62 @@ def source(source_id):
     # Query basic source info
     source = Sources.query.get(source_id)
 
-    # Query citation info
-    if source.source_type == "book":
-        citation_info = Books.query.get(source_id)
-    elif source.source_type == "periodical":
-        citation_info = Periodicals.query.get(source_id)
+    if int(current_user.get_id()) == source.user_id:
+        # Query citation info
+        if source.source_type == "book":
+            citation_info = Books.query.get(source_id)
+        elif source.source_type == "periodical":
+            citation_info = Periodicals.query.get(source_id)
 
-    # Query author info
-    authors = db.session.query(People).join(People_Source).filter(People_Source.source_id == source_id).\
-        filter(People_Source.type=='author').all()
+        # Query author info
+        authors = db.session.query(People).join(People_Source).filter(People_Source.source_id == source_id).\
+            filter(People_Source.type=='author').all()
 
-    # Qury editor info
-    editors = db.session.query(People).join(People_Source).filter(People_Source.source_id == source_id).\
-        filter(People_Source.type=='editor').all()
+        # Qury editor info
+        editors = db.session.query(People).join(People_Source).filter(People_Source.source_id == source_id).\
+            filter(People_Source.type=='editor').all()
 
-    # Query translator info
-    translators = db.session.query(People).join(People_Source).filter(People_Source.source_id == source_id).\
-        filter(People_Source.type=='translator').all()
+        # Query translator info
+        translators = db.session.query(People).join(People_Source).filter(People_Source.source_id == source_id).\
+            filter(People_Source.type=='translator').all()
 
-    # Form to add Notes
-    project_id = db.session.query(Source_Project.project_id).filter(Source_Project.source_id == source.id).scalar()
-    form = NoteForm()
-    form.topic.choices = [(None, "None")] + db.session.query(Topics.id, Topics.name).\
-        filter(Topics.project_id == project_id).all()
-    if request.method == "POST":
-        new_note = Notes(source_id = source.id,
-                         first_page = form.first_page.data,
-                         last_page = form.last_page.data,
-                         note = form.note.data)
-        db.session.add(new_note)
-        db.session.commit()
+        # Form to add Notes
+        project_id = db.session.query(Source_Project.project_id).filter(Source_Project.source_id == source.id).scalar()
+        form = NoteForm()
+        form.topic.choices = [(None, "None")] + db.session.query(Topics.id, Topics.name).\
+            filter(Topics.project_id == project_id).all()
+        if request.method == "POST":
+            new_note = Notes(source_id = source.id,
+                             first_page = form.first_page.data,
+                             last_page = form.last_page.data,
+                             note = form.note.data)
+            db.session.add(new_note)
+            db.session.commit()
 
-        if form.topic.data:
-            for topic in form.topic.data:
-                new_note_id = db.session.query(func.max(Notes.id)).scalar()
+            if form.topic.data:
+                for topic in form.topic.data:
+                    new_note_id = db.session.query(func.max(Notes.id)).scalar()
 
-                new_topic_note = Topics_Notes(note_id = new_note_id,
-                                      topic_id = topic)
-                db.session.add(new_topic_note)
-                db.session.commit()
+                    new_topic_note = Topics_Notes(note_id = new_note_id,
+                                          topic_id = topic)
+                    db.session.add(new_topic_note)
+                    db.session.commit()
 
-    # Query Notes - order by first page
-    notes = db.session.query(Notes, Notes.id).filter(Notes.source_id == source_id).order_by(Notes.first_page)
+        # Query Notes - order by first page
+        notes = db.session.query(Notes, Notes.id).filter(Notes.source_id == source_id).order_by(Notes.first_page)
 
-    return render_template('source_summary.html',
-                           source = source,
-                           info = citation_info,
-                           authors = authors,
-                           editors = editors,
-                           translators = translators,
-                           notes = notes,
-                           form = form)
+        return render_template('source_summary.html',
+                               source = source,
+                               info = citation_info,
+                               authors = authors,
+                               editors = editors,
+                               translators = translators,
+                               notes = notes,
+                               form = form)
+    else:
+        flash("Oops! You aren't authorized to view that page.")
+        return redirect(url_for('projects', user_id = current_user.get_id()))
+
 # View subtopic summary
 @app.route('/subtopic/<subtopic_id>')
 def subtopic(subtopic_id):

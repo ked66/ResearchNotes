@@ -8,6 +8,7 @@ class Users(UserMixin, db.Model):
     email = db.Column(db.String(120), index = True, unique = True)
     password_hash = db.Column(db.String(128))
     projects = db.relationship('Projects', cascade='all,delete-orphan')
+    sources = db.relationship('Sources', cascade='all,delete-orphan')
     sqlite_autoincrement=True
 
     def __repr__(self):
@@ -33,6 +34,7 @@ class Projects(db.Model):
 ## source id & description
 class Sources(db.Model):
     id = db.Column(db.Integer, primary_key = True)
+    user_id = db.Column(db.Integer, db.ForeignKey('users.id'))
     description = db.Column(db.String)
     source_type = db.Column(db.String)
     citation = db.Column(db.String)
