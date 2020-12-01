@@ -283,18 +283,26 @@ def source(source_id):
 
 # View subtopic summary
 @app.route('/subtopic/<subtopic_id>')
+@login_required
 def subtopic(subtopic_id):
     subtopic = Topics.query.get(subtopic_id)
-    note_ids = db.session.query(Topics_Notes.note_id).filter(Topics_Notes.topic_id == subtopic_id).all()
-    note_ids = [id[0] for id in note_ids]
-    notes = db.session.query(Notes, Notes.source_id, Notes.id).filter(Notes.id.in_(note_ids)).all()
-    source_ids = [id[1] for id in notes]
-    sources = db.session.query(Sources).filter(Sources.id.in_(source_ids)).all()
+    user_id = db.session.query(Projects.user_id).join(Topics).filter(Topics.id == subtopic_id).scalar()
 
-    return render_template('subtopic_summary.html',
-                           subtopic = subtopic,
-                           notes = notes,
-                           sources = sources)
+    if int(current_user.get_id()) == user_id:
+        note_ids = db.session.query(Topics_Notes.note_id).filter(Topics_Notes.topic_id == subtopic_id).all()
+        note_ids = [id[0] for id in note_ids]
+        notes = db.session.query(Notes, Notes.source_id, Notes.id).filter(Notes.id.in_(note_ids)).all()
+        source_ids = [id[1] for id in notes]
+        sources = db.session.query(Sources).filter(Sources.id.in_(source_ids)).all()
+
+        return render_template('subtopic_summary.html',
+                               subtopic = subtopic,
+                               notes = notes,
+                               sources = sources)
+
+    else:
+        flash("Oops! You aren't authorized to view that page.")
+        return redirect(url_for('projects', user_id=current_user.get_id()))
 
 # Delete subtopic
 @app.route('/delete/subtopic/<id>', methods = ["POST"])
