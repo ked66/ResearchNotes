@@ -5,7 +5,7 @@
 <h2>Here are your current projects: </h2>
     <ul>
         {% for project in current_projects %}
-            <li><a href = '/project/{{project.id}}' >{{project.name}}</a></li>
+            <li><a href = '/{{current_user.id}}/project/{{project.id}}' >{{project.name}}</a></li>
         {% endfor %}
     </ul>
 
