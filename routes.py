@@ -3,7 +3,7 @@ from forms import ProjectForm, BookForm, PeriodicalForm, SubtopicForm, NoteForm,
 from models import *
 from app import app, db, login_manager
 from flask import render_template, request, redirect, url_for, flash
-from flask_login import login_user, login_required, logout_user
+from flask_login import login_user, login_required, logout_user, current_user
 from sqlalchemy import func
 from citation_programs import mla_book, mla_journal_citation
 from helper_functions import get_form_people, sort_new_people, set_people_defaults, update_people
@@ -61,52 +61,62 @@ def logout():
 @login_required
 def projects(user_id):
     # form to add projects
-    form=ProjectForm()
-    if request.method=='POST' and form.validate():
-        new_project=Projects(name=form.name.data,
+    if current_user.get_id() == user_id:
+        form=ProjectForm()
+        if request.method=='POST' and form.validate():
+            new_project=Projects(name=form.name.data,
                              summary=form.summary.data,
                              user_id = user_id)
-        db.session.add(new_project)
-        db.session.commit()
+            db.session.add(new_project)
+            db.session.commit()
 
-    # query all current projects
-    current_projects = Projects.query.filter(Projects.user_id == user_id).all()
+        # query all current projects
+        current_projects = Projects.query.filter(Projects.user_id == user_id).all()
 
-    return render_template('projects_list.html',
-                           current_projects = current_projects,
-                           form = form,
-                           user = load_user(user_id))
+        return render_template('projects_list.html',
+                               current_projects=current_projects,
+                               form=form,
+                               user=load_user(user_id))
+
+    else:
+        flash("Oops! You aren't authorized to view that page!")
+        return redirect(url_for("welcome"))
 
 # Display summary of given project
-@app.route('/project/<project_id>', methods = ["GET", "POST"])
-def project(project_id):
-    # query current project from Projects
-    current_project = Projects.query.filter_by(id=project_id).first()
+@app.route('/<user_id>/project/<project_id>', methods = ["GET", "POST"])
+@login_required
+def project(user_id, project_id):
+    if current_user.get_id() == user_id:
+        # query current project from Projects
+        current_project = Projects.query.filter_by(id=project_id).first()
 
-    # query current project from Source_Project (to get source ids)
-    project_sources = db.session.query(Source_Project.source_id).filter(Source_Project.project_id==project_id).all()
-    # format source ids as a list
-    project_source_ids = [id[0] for id in project_sources]
-    # query source info
-    sources = db.session.query(Sources).filter(Sources.id.in_(project_source_ids)).all()
+        # query current project from Source_Project (to get source ids)
+        project_sources = db.session.query(Source_Project.source_id).filter(Source_Project.project_id==project_id).all()
+        # format source ids as a list
+        project_source_ids = [id[0] for id in project_sources]
+        # query source info
+        sources = db.session.query(Sources).filter(Sources.id.in_(project_source_ids)).all()
 
-    form = SubtopicForm()
-    # form to add subtopic
-    if request.method == "POST" and form.validate():
-        new_subtopic = Topics(name = form.name.data,
-                            project_id = project_id)
-        db.session.add(new_subtopic)
-        db.session.commit()
+        form = SubtopicForm()
+        # form to add subtopic
+        if request.method == "POST" and form.validate():
+            new_subtopic = Topics(name = form.name.data,
+                                project_id = project_id)
+            db.session.add(new_subtopic)
+            db.session.commit()
 
-    # query subtopics
-    subtopics = db.session.query(Topics).filter(Topics.project_id==project_id).all()
+        # query subtopics
+        subtopics = db.session.query(Topics).filter(Topics.project_id==project_id).all()
 
-    return render_template('project_summary.html',
-                           project_name = current_project.name,
-                           project_summary = current_project.summary,
-                           sources = sources,
-                           subtopics = subtopics,
-                           form = form)
+        return render_template('project_summary.html',
+                               project_name = current_project.name,
+                               project_summary = current_project.summary,
+                               sources = sources,
+                               subtopics = subtopics,
+                               form = form)
+    else:
+        flash("Oops! You aren't authorized to view that page!")
+        return redirect(url_for("welcome"))
 
 # Add source type book
 @app.route('/project/add_source/book', methods=["GET", "POST"])
