@@ -306,52 +306,84 @@ def subtopic(subtopic_id):
 
 # Delete subtopic
 @app.route('/delete/subtopic/<id>', methods = ["POST"])
+@login_required
 def delete_subtopic(id):
-    project_id = db.session.query(Topics.project_id).filter(Topics.id == id).scalar()
-    topic = db.session.query(Topics).filter(Topics.id == id).first()
-    db.session.delete(topic)
-    db.session.commit()
+    user_id = db.session.query(Projects.user_id).join(Topics).filter(Topics.id == id).scalar()
 
-    flash("Subtopic Deleted!")
+    if int(current_user.get_id()) == user_id:
+        project_id = db.session.query(Topics.project_id).filter(Topics.id == id).scalar()
+        topic = db.session.query(Topics).filter(Topics.id == id).first()
+        db.session.delete(topic)
+        db.session.commit()
 
-    return redirect(url_for('project', project_id = project_id))
+        flash("Subtopic Deleted!")
+
+        return redirect(url_for('project', project_id = project_id))
+
+    else:
+        flash("Oops! You aren't authorized to perform that action.")
+        return redirect(url_for('projects', user_id=current_user.get_id()))
 
 # Delete note
 @app.route('/delete/note/<id>', methods = ["POST"])
+@login_required
 def delete_note(id):
     source_id = db.session.query(Notes.source_id).filter(Notes.id == id).scalar()
-    note = db.session.query(Notes).filter(Notes.id == id).first()
-    db.session.delete(note)
-    db.session.commit()
+    user_id = db.session.query(Sources.user_id).filter(Sources.id == source_id).scalar()
 
-    flash("Note Deleted!")
+    if int(current_user.get_id()) == user_id:
+        note = db.session.query(Notes).filter(Notes.id == id).first()
+        db.session.delete(note)
+        db.session.commit()
 
-    return redirect(url_for('source', source_id = source_id))
+        flash("Note Deleted!")
+
+        return redirect(url_for('source', source_id = source_id))
+
+    else:
+        flash("Oops! You aren't authorized to perform that action.")
+        return redirect(url_for('projects', user_id=current_user.get_id()))
 
 # Remove Note from Subtopic
 @app.route('/delete/subtopic_note/<subtopic_id>/<note_id>', methods = ["POST"])
+@login_required
 def delete_subtopic_note(subtopic_id, note_id):
-    topic_note = db.session.query(Topics_Notes).filter(Topics_Notes.topic_id == subtopic_id).\
-        filter(Topics_Notes.note_id == note_id).first()
-    db.session.delete(topic_note)
-    db.session.commit()
+    user_id = db.session.query(Projects.user_id).join(Topics).filter(Topics.id == subtopic_id).scalar()
 
-    flash("Note removed from Subtopic!")
+    if int(current_user.get_id()) == user_id:
+        topic_note = db.session.query(Topics_Notes).filter(Topics_Notes.topic_id == subtopic_id).\
+            filter(Topics_Notes.note_id == note_id).first()
+        db.session.delete(topic_note)
+        db.session.commit()
 
-    return redirect(url_for('subtopic', subtopic_id = subtopic_id))
+        flash("Note removed from Subtopic!")
+
+        return redirect(url_for('subtopic', subtopic_id = subtopic_id))
+
+    else:
+        flash("Oops! You aren't authorized to perform that action.")
+        return redirect(url_for('projects', user_id=current_user.get_id()))
 
 # delete source
 @app.route('/delete/source/<source_id>', methods = ["POST"])
+@login_required
 def delete_source(source_id):
-    project_id = db.session.query(Source_Project.project_id).filter(Source_Project.source_id == source_id).scalar()
-    # note to self: must be deleted in 2 lines like this or cascade won't work
-    source = db.session.query(Sources).filter(Sources.id == source_id).first()
-    db.session.delete(source)
-    db.session.commit()
+    user_id = db.session.query(Sources.user_id).filter(Sources.id == source_id).scalar()
 
-    flash("Source deleted!")
+    if int(current_user.get_id()) == user_id:
+        project_id = db.session.query(Source_Project.project_id).filter(Source_Project.source_id == source_id).scalar()
+        # note to self: must be deleted in 2 lines like this or cascade won't work
+        source = db.session.query(Sources).filter(Sources.id == source_id).first()
+        db.session.delete(source)
+        db.session.commit()
 
-    return redirect(url_for('project', project_id = project_id))
+        flash("Source deleted!")
+
+        return redirect(url_for('project', project_id = project_id))
+
+    else:
+        flash("Oops! You aren't authorized to perform that action.")
+        return redirect(url_for('projects', user_id=current_user.get_id()))
 
 # edit book source information
 @app.route('/edit_source/book/<source_id>', methods = ["GET", "POST"])
