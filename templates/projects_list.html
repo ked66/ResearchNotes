@@ -24,5 +24,18 @@
         <p>{{ form.submit() }}</p>
     </form>
 </div>
+<div class="formwrapper">
+    <h2>Search Notes from ALL Projects: </h2>
+    <form action = "/search_results" method = "POST">
+        {{ search_form.hidden_tag() }}
+        <p>
+            {{ search_form.text.label }} <br>
+            {{ search_form.text }} <br>
+        </p>
+        <p>
+            {{ search_form.search_submit() }}
+        </p>
+    </form>
+</div>
 
 {% endblock %}

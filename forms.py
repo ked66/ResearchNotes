@@ -124,3 +124,8 @@ class SignInForm(FlaskForm):
     email = StringField(label = "Email", validators = [validators.DataRequired()])
     password = PasswordField(label = "Password", validators = [validators.DataRequired()])
     submit = SubmitField(label = "SignIn")
+
+# search form
+class SearchForm(FlaskForm):
+    text = StringField(validators = [validators.DataRequired()])
+    search_submit = SubmitField(label = "Search")

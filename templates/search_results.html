@@ -1,0 +1,15 @@
+{% extends '_base.html' %}
+
+{% block content %}
+    <h2>Here's all your notes containing "{{ search }}"</h2>
+    {% for source in sources %}
+        <h3>{{ source|safe }}</h3>
+        <ul>
+        {% for note in notes_sources %}
+            {% if note[1] == source %}
+                <li>{{ note[0] }}</li>
+            {% endif %}
+        {% endfor %}
+        </ul>
+    {% endfor %}
+{% endblock %}

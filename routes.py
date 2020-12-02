@@ -1,5 +1,5 @@
 from forms import ProjectForm, BookForm, PeriodicalForm, SubtopicForm, NoteForm, \
-    RegistrationForm, SignInForm
+    RegistrationForm, SignInForm, SearchForm
 from models import *
 from app import app, db, login_manager
 from flask import render_template, request, redirect, url_for, flash
@@ -65,7 +65,9 @@ def projects(user_id):
     # form to add projects
     if current_user.get_id() == user_id:
         form=ProjectForm()
-        if request.method=='POST' and form.validate():
+        search_form = SearchForm()
+
+        if form.submit.data and form.validate():
             new_project=Projects(name=form.name.data,
                              summary=form.summary.data,
                              user_id = user_id)
@@ -78,6 +80,7 @@ def projects(user_id):
         return render_template('projects_list.html',
                                current_projects=current_projects,
                                form=form,
+                               search_form = search_form,
                                user=load_user(user_id))
 
     else:
@@ -532,3 +535,19 @@ def edit_source_periodical(source_id):
     else:
         flash("Oops! You aren't authorized to perform that action.")
         return redirect(url_for('projects', user_id=current_user.get_id()))
+
+@app.route("/search_results", methods=["GET", "POST"])
+@login_required
+def search_results():
+    search_form = SearchForm()
+
+    if search_form.validate_on_submit():
+        search_phrase = "%{}%".format(search_form.text.data)
+        notes_sources = db.session.query(Notes, Sources.citation).join(Sources).\
+            filter(Notes.note.like(search_phrase)).filter(Sources.user_id == current_user.get_id()).all()
+        unique_sources = list(set([item[1] for item in notes_sources]))
+
+        return render_template("search_results.html",
+                               search = search_form.text.data,
+                               sources = unique_sources,
+                               notes_sources = notes_sources)
