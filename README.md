@@ -11,8 +11,6 @@ Hosted by herokuapp
 ### Homepage
 Sign in with username and password
 
-*under construction*
-
 ### Projects List
 List of current projects, option to add more
 
@@ -36,7 +34,8 @@ Allows user to search & sort notes
 *under construction*
 
 ## To-Do:
-- Add user sign-in
+- Add user sign-in :white_check_mark:
+    - 2 Dec. 2020: All pages besides homepage require login, and users can only edit their own projects/sources/notes, etc. 
 - Add note search functionality
 - Expand supported source types
 - Add CSS formatting
@@ -45,6 +44,7 @@ Allows user to search & sort notes
 - [Flask](https://flask.palletsprojects.com/en/1.1.x/#): web framework that wraps [Werkzeug](https://werkzeug.palletsprojects.com/), a unicode web application library, and [Jinja](http://jinja.pocoo.org/docs), a web templating language for python
 - [WTForms](https://wtforms.readthedocs.io/en/2.3.x/): web library to support form validation and rendering
 - [SQLAlchemy](https://docs.sqlalchemy.org/en/13/): ORM to connect python and SQL databases (SQLite in early development, PostgreSQL in app)
+- [Werkzeug.security](https://werkzeug.palletsprojects.com/en/1.0.x/utils/#module-werkzeug.security): Werkzeug utility functions to easily hash user passwords
 
 ## Creator
 [Katie Dillon](https://github.com/ked66)
