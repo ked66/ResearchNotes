@@ -25,6 +25,8 @@ def new_user():
         db.session.add(user)
         db.session.commit()
 
+        login_user(user, remember=True)
+
         return redirect(url_for('projects', user_id = user.id))
 
     return render_template('user_registration.html', form=form)
