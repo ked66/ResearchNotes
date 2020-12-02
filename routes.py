@@ -387,128 +387,146 @@ def delete_source(source_id):
 
 # edit book source information
 @app.route('/edit_source/book/<source_id>', methods = ["GET", "POST"])
+@login_required
 def edit_source_book(source_id):
-    book = Books.query.get(source_id)
-    source = Sources.query.get(source_id)
-    project = db.session.query(Source_Project.project_id).filter(Source_Project.source_id == source_id).scalar()
+    user_id = db.session.query(Projects.user_id).join(Source_Project).\
+        filter(Source_Project.source_id == source_id).scalar()
 
-    # initialize form
-    form = BookForm()
-    form.project.choices = db.session.query(Projects.id, Projects.name).all()
+    if int(current_user.get_id()) == user_id:
+        book = Books.query.get(source_id)
+        source = Sources.query.get(source_id)
+        project = db.session.query(Source_Project.project_id).filter(Source_Project.source_id == source_id).scalar()
 
-    # default form to existing information
-    form.project.default = project
-    form.title.default = book.title
-    form.publisher.default = book.publisher
-    form.year.default = book.year
-    form.edition.default = book.edition
-    form.section.default = book.section
-    form.description.default = source.description
-
-    # change submit button label
-    form.submit.label.text = "Save Changes"
-
-    # get lists of people, people_ids & set people defaults
-    people, people_id = set_people_defaults(form, source_id)
-
-    # save defaults
-    form.process()
-
-    if request.method == "POST":
-        # Initialize form with new inputs
+        # initialize form
         form = BookForm()
+        form.project.choices = db.session.query(Projects.id, Projects.name).all()
 
-        # Update Book instance
-        db.session.query(Books).filter(Books.source_id == source_id).update(
-            {Books.title: form.title.data,
-             Books.publisher: form.publisher.data,
-             Books.edition: form.edition.data,
-             Books.section: form.section.data})
-        db.session.commit()
+        # default form to existing information
+        form.project.default = project
+        form.title.default = book.title
+        form.publisher.default = book.publisher
+        form.year.default = book.year
+        form.edition.default = book.edition
+        form.section.default = book.section
+        form.description.default = source.description
 
-        # Update People instances
-        authors, editors, translators = update_people(form, people, people_id, source_id)
+        # change submit button label
+        form.submit.label.text = "Save Changes"
 
-        # Generate citation & update Source instance
-        citation = mla_book(authors = authors,
-                            title = form.title.data,
-                            publisher = form.publisher.data,
-                            year = form.year.data,
-                            editor= editors,
-                            translator= translators,
-                            author_type="person",
-                            edition= form.edition.data,
-                            volume= form.volume.data)
+        # get lists of people, people_ids & set people defaults
+        people, people_id = set_people_defaults(form, source_id)
 
-        db.session.query(Sources).filter(Sources.id == source_id).update({Sources.citation: citation})
+        # save defaults
+        form.process()
 
-        db.session.commit()
-        
-        return redirect(url_for('project', project_id = project))
-        
+        if request.method == "POST":
+            # Initialize form with new inputs
+            form = BookForm()
 
-    return render_template('add_book.html', form = form)
+            # Update Book instance
+            db.session.query(Books).filter(Books.source_id == source_id).update(
+                {Books.title: form.title.data,
+                 Books.publisher: form.publisher.data,
+                 Books.edition: form.edition.data,
+                 Books.section: form.section.data})
+            db.session.commit()
+
+            # Update People instances
+            authors, editors, translators = update_people(form, people, people_id, source_id)
+
+            # Generate citation & update Source instance
+            citation = mla_book(authors = authors,
+                                title = form.title.data,
+                                publisher = form.publisher.data,
+                                year = form.year.data,
+                                editor= editors,
+                                translator= translators,
+                                author_type="person",
+                                edition= form.edition.data,
+                                volume= form.volume.data)
+
+            db.session.query(Sources).filter(Sources.id == source_id).update({Sources.citation: citation})
+
+            db.session.commit()
+
+            return redirect(url_for('project', project_id = project))
+
+
+        return render_template('add_book.html', form = form)
+
+    else:
+        flash("Oops! You aren't authorized to perform that action.")
+        return redirect(url_for('projects', user_id=current_user.get_id()))
 
 # edit periodical source information
 @app.route('/edit_source/periodical/<source_id>', methods = ["GET", "POST"])
+@login_required
 def edit_source_periodical(source_id):
-    periodical = Periodicals.query.get(source_id)
-    source = Sources.query.get(source_id)
-    project = db.session.query(Source_Project.project_id).filter(Source_Project.source_id == source_id).scalar()
+    user_id = db.session.query(Projects.user_id).join(Source_Project). \
+        filter(Source_Project.source_id == source_id).scalar()
 
-    # initialize form
-    form = PeriodicalForm()
-    form.project.choices = db.session.query(Projects.id, Projects.name).all()
+    if int(current_user.get_id()) == user_id:
+        periodical = Periodicals.query.get(source_id)
+        source = Sources.query.get(source_id)
+        project = db.session.query(Source_Project.project_id).filter(Source_Project.source_id == source_id).scalar()
 
-    # default form to existing information
-    form.project.default = project
-    form.title.default = periodical.title
-    form.journal.default = periodical.journal
-    form.volume.default = periodical.volume
-    form.issue.default = periodical.issue
-    form.month.default = periodical.month
-    form.year.default = periodical.year
-    form.description.default = source.description
-
-    # change submit button label
-    form.submit.label.text = "Save Changes"
-
-    # get lists of people, people_ids & set people defaults
-    people, people_id = set_people_defaults(form, source_id)
-
-    # save defaults
-    form.process()
-
-    if request.method == "POST":
-        # Initialize form with new inputs
+        # initialize form
         form = PeriodicalForm()
+        form.project.choices = db.session.query(Projects.id, Projects.name).all()
 
-        # Update Book instance
-        db.session.query(Periodicals).filter(Periodicals.source_id == source_id).update(
-            {Periodicals.title: form.title.data,
-             Periodicals.journal: form.journal.data,
-             Periodicals.volume: form.volume.data,
-             Periodicals.issue: form.issue.data,
-             Periodicals.month: form.month.data,
-             Periodicals.year: form.year.data})
-        db.session.commit()
+        # default form to existing information
+        form.project.default = project
+        form.title.default = periodical.title
+        form.journal.default = periodical.journal
+        form.volume.default = periodical.volume
+        form.issue.default = periodical.issue
+        form.month.default = periodical.month
+        form.year.default = periodical.year
+        form.description.default = source.description
 
-        # Update People instances
-        authors, editors, translators = update_people(form, people, people_id, source_id)
+        # change submit button label
+        form.submit.label.text = "Save Changes"
 
-        # Generate citation & update Source instance
-        citation = mla_journal_citation(authors=authors,
-                                        title=form.title.data,
-                                        journal=form.journal.data,
-                                        volume=form.volume.data,
-                                        issue=form.issue.data,
-                                        month=form.month.data,
-                                        year=form.year.data)
+        # get lists of people, people_ids & set people defaults
+        people, people_id = set_people_defaults(form, source_id)
 
-        db.session.query(Sources).filter(Sources.id == source_id).update({Sources.citation: citation})
+        # save defaults
+        form.process()
 
-        db.session.commit()
+        if request.method == "POST":
+            # Initialize form with new inputs
+            form = PeriodicalForm()
 
-        return redirect(url_for('project', project_id=project))
+            # Update Book instance
+            db.session.query(Periodicals).filter(Periodicals.source_id == source_id).update(
+                {Periodicals.title: form.title.data,
+                 Periodicals.journal: form.journal.data,
+                 Periodicals.volume: form.volume.data,
+                 Periodicals.issue: form.issue.data,
+                 Periodicals.month: form.month.data,
+                 Periodicals.year: form.year.data})
+            db.session.commit()
 
-    return render_template('add_periodical.html', form=form)
+            # Update People instances
+            authors, editors, translators = update_people(form, people, people_id, source_id)
+
+            # Generate citation & update Source instance
+            citation = mla_journal_citation(authors=authors,
+                                            title=form.title.data,
+                                            journal=form.journal.data,
+                                            volume=form.volume.data,
+                                            issue=form.issue.data,
+                                            month=form.month.data,
+                                            year=form.year.data)
+
+            db.session.query(Sources).filter(Sources.id == source_id).update({Sources.citation: citation})
+
+            db.session.commit()
+
+            return redirect(url_for('project', project_id=project))
+
+        return render_template('add_periodical.html', form=form)
+
+    else:
+        flash("Oops! You aren't authorized to perform that action.")
+        return redirect(url_for('projects', user_id=current_user.get_id()))
