@@ -13,6 +13,8 @@ app.config['SECRET_KEY'] = 'secret'
 # create db file
 db = SQLAlchemy(app)
 
+app.static_folder = 'static'
+
 # create login manager
 login_manager = LoginManager()
 login_manager.init_app(app)

@@ -10,6 +10,28 @@
         }
     </script>
     <title>ResearchNotes</title>
+    <link rel="stylesheet" type = "text/css" href="{{ url_for('static', filename='stylesheet.css') }}">
+    <div class = "topnav">
+        <ul>
+            <li class="dropdown">
+                <a href="javascript:void(0)" class="dropbtn">Projects</a>
+                    <div class="dropdown-content">
+                        <a href = "/{{ current_user.get_id() }}/projects">Projects List</a><br>
+                        {% for project in g.projects_list %}
+                        <a href = "/project/{{ project.id }}">{{ project.name }}</a><br>
+                        {% endfor %}
+                    </div>
+            </li>
+            <li class="dropdown">
+                <a href="javascript:void(0)" class="dropbtn">Add Source</a>
+                    <div class="dropdown-content">
+                        <a href = "/project/add_source/book">Book</a><br>
+                        <a href = "/project/add_source/periodical">Periodical</a><br>
+                    </div>
+             </li>
+            <li><a href = "/advanced_search">Search</a><li>
+        </ul>
+    </div>
     {% with messages = get_flashed_messages() %}
         {% if messages %}
         <ul class=flashes>

@@ -2,8 +2,9 @@ from forms import ProjectForm, BookForm, PeriodicalForm, SubtopicForm, NoteForm,
     RegistrationForm, SignInForm, SearchForm, AdvancedSearchForm
 from models import *
 from app import app, db, login_manager
-from flask import render_template, request, redirect, url_for, flash
+from flask import render_template, request, redirect, url_for, flash, g
 from flask_login import login_user, login_required, logout_user, current_user
+from functools import wraps
 from sqlalchemy import func
 from citation_programs import mla_book, mla_journal_citation
 from helper_functions import get_form_people, sort_new_people, set_people_defaults, update_people
@@ -12,6 +13,18 @@ from helper_functions import get_form_people, sort_new_people, set_people_defaul
 @login_manager.user_loader
 def load_user(user_id):
   return Users.query.get(int(user_id))
+
+# decorator to populate "projects" in navbar
+def get_projects_list(f):
+    @wraps(f)
+    def decorated_function(*args, **kwargs):
+        projects_list = Projects.query.filter(Projects.user_id == int(current_user.get_id())).all()
+        if "projects_list" not in g:
+            g.projects_list = projects_list
+
+        return f(*args, **kwargs)
+
+    return decorated_function
 
 # Display registration form
 @app.route("/new_user", methods = ["GET", "POST"])
@@ -61,6 +74,7 @@ def logout():
 # Display list of current projects, add projects
 @app.route("/<user_id>/projects", methods=["GET", "POST"])
 @login_required
+@get_projects_list
 def projects(user_id):
     # form to add projects
     if current_user.get_id() == user_id:
@@ -90,6 +104,7 @@ def projects(user_id):
 # Display summary of given project
 @app.route('/project/<project_id>', methods = ["GET", "POST"])
 @login_required
+@get_projects_list
 def project(project_id):
     # query current project from Projects
     current_project = Projects.query.filter_by(id=project_id).first()
@@ -126,6 +141,7 @@ def project(project_id):
 # Add source type book
 @app.route('/project/add_source/book', methods=["GET", "POST"])
 @login_required
+@get_projects_list
 def add_book():
     form = BookForm()
     form.project.choices = db.session.query(Projects.id, Projects.name).\
@@ -179,6 +195,7 @@ def add_book():
 # Add source type periodical
 @app.route('/project/add_source/periodical', methods=["GET", "POST"])
 @login_required
+@get_projects_list
 def add_periodical():
     form = PeriodicalForm()
     form.project.choices = db.session.query(Projects.id, Projects.name).\
@@ -226,6 +243,8 @@ def add_periodical():
 
 # View Source and Add Notes
 @app.route('/source/<source_id>', methods = ["GET", "POST"])
+@login_required
+@get_projects_list
 def source(source_id):
     # Query basic source info
     source = Sources.query.get(source_id)
@@ -289,6 +308,7 @@ def source(source_id):
 # View subtopic summary
 @app.route('/subtopic/<subtopic_id>')
 @login_required
+@get_projects_list
 def subtopic(subtopic_id):
     subtopic = Topics.query.get(subtopic_id)
     user_id = db.session.query(Projects.user_id).join(Topics).filter(Topics.id == subtopic_id).scalar()
@@ -393,6 +413,7 @@ def delete_source(source_id):
 # edit book source information
 @app.route('/edit_source/book/<source_id>', methods = ["GET", "POST"])
 @login_required
+@get_projects_list
 def edit_source_book(source_id):
     user_id = db.session.query(Projects.user_id).join(Source_Project).\
         filter(Source_Project.source_id == source_id).scalar()
@@ -466,6 +487,7 @@ def edit_source_book(source_id):
 # edit periodical source information
 @app.route('/edit_source/periodical/<source_id>', methods = ["GET", "POST"])
 @login_required
+@get_projects_list
 def edit_source_periodical(source_id):
     user_id = db.session.query(Projects.user_id).join(Source_Project). \
         filter(Source_Project.source_id == source_id).scalar()
@@ -538,6 +560,7 @@ def edit_source_periodical(source_id):
 
 @app.route("/search_results", methods=["GET", "POST"])
 @login_required
+@get_projects_list
 def search_results():
     search_form = SearchForm()
 
@@ -557,6 +580,7 @@ def search_results():
 
 @app.route("/advanced_search", methods = ["GET", "POST"])
 @login_required
+@get_projects_list
 def advanced_search():
     form = AdvancedSearchForm()
     form.source_type.choices = db.session.query(Sources.source_type, Sources.source_type).\
