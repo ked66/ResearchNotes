@@ -1,5 +1,5 @@
 from forms import ProjectForm, BookForm, PeriodicalForm, SubtopicForm, NoteForm, \
-    RegistrationForm, SignInForm, SearchForm
+    RegistrationForm, SignInForm, SearchForm, AdvancedSearchForm
 from models import *
 from app import app, db, login_manager
 from flask import render_template, request, redirect, url_for, flash
@@ -544,10 +544,46 @@ def search_results():
     if search_form.validate_on_submit():
         search_phrase = "%{}%".format(search_form.text.data)
         notes_sources = db.session.query(Notes, Sources.citation).join(Sources).\
-            filter(Notes.note.like(search_phrase)).filter(Sources.user_id == current_user.get_id()).all()
+            filter(Sources.user_id == current_user.get_id()).filter(Notes.note.like(search_phrase)).all()
         unique_sources = list(set([item[1] for item in notes_sources]))
 
         return render_template("search_results.html",
                                search = search_form.text.data,
                                sources = unique_sources,
                                notes_sources = notes_sources)
+
+    else:
+        return redirect(url_for('projects', user_id=current_user.get_id()))
+
+@app.route("/advanced_search", methods = ["GET", "POST"])
+@login_required
+def advanced_search():
+    form = AdvancedSearchForm()
+    form.source_type.choices = db.session.query(Sources.source_type, Sources.source_type).\
+        filter(Sources.user_id == current_user.get_id()).distinct().all()
+    form.project.choices = db.session.query(Projects.id, Projects.name).\
+        filter(Sources.user_id == current_user.get_id()).distinct().all()
+
+    if form.project.data:
+        form.subtopic.choices = db.session.query(Topics.id, Topics.name).join(Projects). \
+            filter(Projects.user_id == current_user.get_id()).filter(Projects.id.in_(form.project.data)).all()
+    else:
+        pass
+        #form.subtopic.choices = db.session.query(Topics.id, Topics.name).join(Projects).\
+            #filter(Projects.user_id == current_user.get_id()).all()
+
+
+    return render_template("advanced_search.html", form = form)
+
+#@app.route("/advanced_search_results", methods = ["GET", "POST"])
+#@login_required
+#def advanced_search_results():
+    #form = AdvancedSearchForm()
+
+    #if form.validate_on_submit():
+        # narrow by project
+        #project_ids = form.project.data
+        # narrow by source
+        #source_ids = db.session.query(Sources.id).filter(Sources.source_type.in_(form.source_type.data))
+        # narrow by subtopic
+        # narrow by note text search

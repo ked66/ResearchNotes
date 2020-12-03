@@ -1,0 +1,43 @@
+{% extends '_base.html' %}
+
+{% block content %}
+
+<div class="formwrapper">
+    <h2>Advanced Search</h2>
+    <form action = "/" method = "POST">
+        {{ form.hidden_tag() }}
+        <p>
+            {{ form.note_text.label }} <br>
+            {{ form.note_text }} <br>
+        </p>
+        <p>
+            {{ form.source_title_text.label }} <br>
+            {{ form.source_title_text }} <br>
+        </p>
+        <p>
+            {{ form.source_person_text.label }} <br>
+            {{ form.source_person_text }} <br>
+        </p>
+        <p>
+            {{ form.source_type.label }} <br>
+            {{ form.source_type }} <br>
+        </p>
+        <p>
+            {{ form.source_year_begin.label }} <br>
+            {{ form.source_year_begin }} to {{ form.source_year_end }} <br>
+        </p>
+        <p>
+            {{ form.project.label }} <br>
+            {{ form.project }} <br>
+        </p>
+        <p>
+            {{ form.subtopic.label }} <br>
+            {{ form.subtopic }} <br>
+        </p>
+        <p>
+            {{ form.submit() }}
+        </p>
+    </form>
+</div>
+
+{% endblock %}

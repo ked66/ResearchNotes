@@ -129,3 +129,14 @@ class SignInForm(FlaskForm):
 class SearchForm(FlaskForm):
     text = StringField(validators = [validators.DataRequired()])
     search_submit = SubmitField(label = "Search")
+
+class AdvancedSearchForm(FlaskForm):
+    note_text = StringField(label = "Search Note Text")
+    source_title_text = StringField(label = "Search Source Title")
+    source_person_text = StringField(label = "Search Source Contributers (authors, editors, etc.)")
+    source_type = MultiCheckboxField(label = "Select Source Type(s)")
+    source_year_begin = IntegerField(label = "Select Year Range of Source Publication")
+    source_year_end = IntegerField()
+    project = SelectField(label = "Select Project(s)")
+    subtopic = SelectField(label = "Select Subtopic(s)")
+    submit = SubmitField(label = "Search")
