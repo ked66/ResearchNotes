@@ -18,6 +18,10 @@ p, a, li {
    float: left;
 }
 
+.topnav li.right {
+   float: right;
+}
+
 .topnav li a, .dropbtn {
   display: inline-block;
   color: white;
