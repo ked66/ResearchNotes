@@ -22,6 +22,10 @@ p, a, li {
    float: right;
 }
 
+.topnav li.nofloat {
+   float: none;
+}
+
 .topnav li a, .dropbtn {
   display: inline-block;
   color: white;
@@ -36,26 +40,32 @@ li.dropdown {
     display: inline-block;
 }
 
-.dropdown-content {
+ul.dropdown-content {
   display: none;
   position: absolute;
   background-color: #f9f9f9;
   min-width: 160px;
+  padding: 0px;
   box-shadow: 8px 8px 16px 8px rgba(0,0,0,0.2);
   z-index: 1;
 }
 
-.dropdown-content a {
+ul.dropdown-content li a {
+  float: none;
   color: black !important;
-  padding: 12px 16px;
   text-decoration: none;
   display: block;
   text-align: left;
+}
+
+.topnav .dropdown-content li a:hover {
+  background-color: #ddd !important;
 }
 
 .dropdown:hover .dropdown-content {
   display: block;
 }
 
-
-
+.topnav a:hover, .dropdown:hover .dropbtn {
+  background-color: #444444;
+}

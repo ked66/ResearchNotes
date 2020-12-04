@@ -16,19 +16,19 @@
         <ul>
             <li class="dropdown">
                 <a href="javascript:void(0)" class="dropbtn">Projects</a>
-                    <div class="dropdown-content">
-                        <a href = "/{{ current_user.get_id() }}/projects">Projects List</a><br>
+                    <ul class="dropdown-content">
+                        <li class = "nofloat"><a href = "/{{ current_user.get_id() }}/projects">Projects List</a></li>
                         {% for project in g.projects_list %}
-                        <a href = "/project/{{ project.id }}">{{ project.name }}</a><br>
+                        <li class = "nofloat"><a href = "/project/{{ project.id }}">{{ project.name }}</a></li>
                         {% endfor %}
-                    </div>
+                    </ul>
             </li>
             <li class="dropdown">
                 <a href="javascript:void(0)" class="dropbtn">Add Source</a>
-                    <div class="dropdown-content">
-                        <a href = "/project/add_source/book">Book</a><br>
-                        <a href = "/project/add_source/periodical">Periodical</a><br>
-                    </div>
+                    <ul class="dropdown-content">
+                        <li class = "nofloat"><a href = "/project/add_source/book">Book</a></li>
+                        <li class = "nofloat"><a href = "/project/add_source/periodical">Periodical</a></li>
+                    </ul>
              </li>
             <li><a href = "/advanced_search">Search</a><li>
             <li class="right"><a href = "/logout">Logout</a></li>
