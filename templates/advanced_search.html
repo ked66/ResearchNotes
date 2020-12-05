@@ -2,6 +2,12 @@
 
 {% block content %}
 
+<script type=text/javascript src = "{{ url_for('static', filename='jquery.js') }}"></script>
+<script type=text/javascript>
+  $SCRIPT_ROOT = {{ request.script_root|tojson|safe }};
+</script>
+<script type = text/javascript src = "{{ url_for('static', filename='advanced_search.js') }}"></script>
+
 <div class="formwrapper">
     <h2>Advanced Search</h2>
     <form action = "/" method = "POST">

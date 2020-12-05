@@ -2,7 +2,7 @@ from forms import ProjectForm, BookForm, PeriodicalForm, SubtopicForm, NoteForm,
     RegistrationForm, SignInForm, SearchForm, AdvancedSearchForm
 from models import *
 from app import app, db, login_manager
-from flask import render_template, request, redirect, url_for, flash, g
+from flask import render_template, request, redirect, url_for, flash, g, jsonify
 from flask_login import login_user, login_required, logout_user, current_user
 from functools import wraps
 from sqlalchemy import func
@@ -588,14 +588,7 @@ def advanced_search():
     form.project.choices = db.session.query(Projects.id, Projects.name).\
         filter(Sources.user_id == current_user.get_id()).distinct().all()
 
-    if form.project.data:
-        form.subtopic.choices = db.session.query(Topics.id, Topics.name).join(Projects). \
-            filter(Projects.user_id == current_user.get_id()).filter(Projects.id.in_(form.project.data)).all()
-    else:
-        pass
-        #form.subtopic.choices = db.session.query(Topics.id, Topics.name).join(Projects).\
-            #filter(Projects.user_id == current_user.get_id()).all()
-
+    form.subtopic.choices = [(None, "None")]
 
     return render_template("advanced_search.html", form = form)
 
@@ -611,3 +604,12 @@ def advanced_search():
         #source_ids = db.session.query(Sources.id).filter(Sources.source_type.in_(form.source_type.data))
         # narrow by subtopic
         # narrow by note text search
+
+@app.route("/_parse_data", methods = ["GET"])
+def parse_data():
+    if request.method == "GET":
+        id = request.args.get('b', 0)
+        topics = db.session.query(Topics.id, Topics.name, func.row_number().over(order_by=Topics.id)).\
+            filter(Topics.project_id == id).all()
+
+    return jsonify(topics)
