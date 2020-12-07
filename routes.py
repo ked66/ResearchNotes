@@ -5,7 +5,7 @@ from app import app, db, login_manager
 from flask import render_template, request, redirect, url_for, flash, g, jsonify
 from flask_login import login_user, login_required, logout_user, current_user
 from functools import wraps
-from sqlalchemy import func
+from sqlalchemy import func, or_
 from citation_programs import mla_book, mla_journal_citation
 from helper_functions import get_form_people, sort_new_people, set_people_defaults, update_people
 
@@ -592,12 +592,71 @@ def advanced_search():
 
     return render_template("advanced_search.html", form = form)
 
-#@app.route("/advanced_search_results", methods = ["GET", "POST"])
-#@login_required
-#def advanced_search_results():
-    #form = AdvancedSearchForm()
+@app.route("/advanced_search_results", methods = ["GET", "POST"])
+@login_required
+def advanced_search_results():
+    form = AdvancedSearchForm()
 
-    #if form.validate_on_submit():
+    if form.is_submitted():
+
+        person_phrase = "%{}%".format(form.source_person_text.data)
+        title_phrase = "%{}%".format(form.source_title_text.data)
+        note_phrase = "%{}%".format(form.note_text.data)
+
+        # find sources that meet search criteria
+        books = db.session.query(Sources.id).\
+            join(Source_Project, isouter=True).join(Books).join(People_Source,isouter=True).\
+            join(People,isouter=True).\
+            filter(Sources.user_id == current_user.get_id())
+
+        periodicals = db.session.query(Sources.id).\
+            join(Source_Project, isouter=True).join(Periodicals).join(People_Source, isouter=True).\
+            join(People, isouter=True).\
+            filter(Sources.user_id == current_user.get_id())
+
+        if form.project.data:
+            books = books.filter(Source_Project.project_id.in_(form.project.data))
+            periodicals = periodicals.filter(Source_Project.project_id.in_(form.project.data))
+
+        if form.source_type.data:
+            books = books.filter(Sources.source_type.in_(form.source_type.data))
+            periodicals = periodicals.filter(Sources.source_type.in_(form.source_type.data))
+
+        if form.source_title_text.data:
+            books = books.filter(Books.title.like(title_phrase))
+            periodicals = periodicals.filter(Periodicals.title.like(title_phrase))
+
+        if form.source_year_begin.data:
+            books = books.filter(Books.year.between(form.source_year_begin.data, form.source_year_end.data))
+            periodicals = periodicals.\
+                filter(Periodicals.year.between(form.source_year_begin.data, form.source_year_end.data))
+
+        if form.source_person_text.data:
+            books = books.filter(People.last.like(person_phrase))
+            periodicals = periodicals.filter(People.last.like(person_phrase))
+
+        # get source_ids from sources that meet criteria
+        source_ids = [i[0] for i in books.all()] + [j[0] for j in periodicals.all()]
+
+        note_sources = db.session.query(Notes, Sources.citation).\
+            join(Sources).join(Topics_Notes, isouter=True).filter(Sources.id.in_(source_ids))
+
+        if form.subtopic.data:
+            note_sources = note_sources.filter(Topics_Notes.topic_id.in_(form.subtopic.data))
+
+        if form.note_text.data:
+            note_sources = note_sources.filter(Notes.note.like(note_phrase))
+
+        results = note_sources.all()
+        unique_sources = list(set([item[1] for item in results]))
+
+        return render_template("search_results.html",
+                               search="your specifications",
+                               sources=unique_sources,
+                               notes_sources=results)
+    else:
+        return redirect(url_for('advanced_search'))
+
         # narrow by project
         #project_ids = form.project.data
         # narrow by source
