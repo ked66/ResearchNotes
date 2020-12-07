@@ -15,7 +15,7 @@ $(document).ready(function(){
         }, function(data) {
             var options = $("#subtopic");
                 $.each(data, function() {
-                    options.append($("<option />".val($(this)[0]).text($(this)[1])))
+                    options.append($("<option \>").val($(this)[0]).text($(this)[1]))
                     // options.append($("<li><input id='subtopic'-" + $(this)[2] + "' name = 'subtopic' type='checkbox' value=" + $(this)[0] + "><label for='subtopic-" + $(this)[2] + "'>" + $(this)[1] + "</label></li>"
 
             });
