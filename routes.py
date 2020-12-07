@@ -292,6 +292,10 @@ def source(source_id):
 
         # Query Notes - order by first page
         notes = db.session.query(Notes, Notes.id).filter(Notes.source_id == source_id).order_by(Notes.first_page)
+        note_ids = [note[1] for note in notes]
+
+        topics = db.session.query(Topics.name, Topics.id, Topics_Notes.note_id).join(Topics_Notes).\
+            filter(Topics_Notes.note_id.in_(note_ids)).all()
 
         return render_template('source_summary.html',
                                source = source,
@@ -300,6 +304,7 @@ def source(source_id):
                                editors = editors,
                                translators = translators,
                                notes = notes,
+                               topics = topics,
                                form = form)
     else:
         flash("Oops! You aren't authorized to view that page.")

@@ -9,6 +9,9 @@
 </div>
 <div class="citation information">
     <h3>Citation Information:</h3>
+    <p><b>MLA 8 Citation: </b><br>
+        {{ source.citation | safe }}
+    </p>
     <p><b>Author(s): </b>
     {{ authors[0] }}
     {% for author in authors[1:] %}
@@ -43,12 +46,22 @@
 
 <div class="notes">
     <h3>Notes: </h3>
-    <ul>
+    <ul class = "note">
         {% for note in notes %}
-            <li>{{ note[0] }}
-            <form action="/delete/note/{{ note[1] }}" method="post">
-                <input type="submit" value="Delete Note" />
-            </form>
+            <li>
+                <form action="/delete/note/{{ note[1] }}" method="post" class = "right">
+                    <input type="submit" value="Delete Note" />
+                </form><br>
+                {{ note[0] }}
+                <div class = "topic">
+                    <ul>
+                        {% for topic in topics %}
+                            {% if topic.note_id == note[1] %}
+                            <li><a href = "/subtopic/{{topic.id}}">{{ topic.name }}</a></li>
+                            {% endif %}
+                        {% endfor %}
+                    </ul>
+                </div>
             </li>
         {% endfor %}
     </ul>

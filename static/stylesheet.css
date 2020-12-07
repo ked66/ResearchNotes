@@ -69,3 +69,52 @@ ul.dropdown-content li a {
 .topnav a:hover, .dropdown:hover .dropbtn {
   background-color: #444444;
 }
+
+ul.note {
+    list-style-type: none;
+    overflow: hidden;
+    position: relative;
+}
+
+ul.note li {
+    border: 2px solid #444444;
+    border-left: 5px solid #0C76B4;
+    padding: 5px;
+    padding-bottom: 60px;
+    margin: 10px;
+    max-width: 500px;
+    min-height: 80px;
+    position: relative;
+    box-shadow: 2px 2px 4px 2px rgba(0,0,0,0.2);
+}
+
+.topic ul {
+    list-style-type: none;
+    list-style-position: inside;
+    overflow: hidden;
+    padding-left: 0px;
+    height: 40px;
+    position: absolute;
+    bottom: 10px;
+}
+
+.topic ul li {
+    border-style: none;
+    box-shadow: none;
+    background: #d623cb;
+    float: left;
+}
+
+.topic ul li:hover {
+    background: #c01fb6;
+}
+
+.topic ul li a {
+    color: white;
+    text-decoration: none;
+}
+
+ul.note .right {
+    float: right;
+    overflow: hidden;
+}
