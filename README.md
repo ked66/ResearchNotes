@@ -37,8 +37,11 @@ Allows user to search & sort notes
 - Add user sign-in :white_check_mark:
     - 2 Dec. 2020: All pages besides homepage require login, and users can only edit their own projects/sources/notes, etc. 
 - Add note search functionality
+    - 7 Dec. 2020: Simple Note search available on "Projects List" page, and Advanced Search available
+    - Still to do: improve search by contributer option (currently can only search last name)
 - Expand supported source types
 - Add CSS formatting
+    - 3 Dec. 2020: Added top Navigation Bar, added font styles "Sniglet" and "Roboto"
 
 ## Built Using
 - [Flask](https://flask.palletsprojects.com/en/1.1.x/#): web framework that wraps [Werkzeug](https://werkzeug.palletsprojects.com/), a unicode web application library, and [Jinja](http://jinja.pocoo.org/docs), a web templating language for python
