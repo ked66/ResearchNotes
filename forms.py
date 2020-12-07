@@ -137,6 +137,6 @@ class AdvancedSearchForm(FlaskForm):
     source_type = MultiCheckboxField(label = "Select Source Type(s)")
     source_year_begin = IntegerField(label = "Select Year Range of Source Publication")
     source_year_end = IntegerField()
-    project = SelectField(label = "Select Project(s)")
-    subtopic = SelectField(label = "Select Subtopic(s)")
+    project = MultiCheckboxField(label = "Select Project(s)")
+    subtopic = MultiCheckboxField(label = "Select Subtopic(s)")
     submit = SubmitField(label = "Search")

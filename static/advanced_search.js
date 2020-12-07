@@ -6,8 +6,8 @@ $(document).ready(function(){
         event.preventDefault();
         $('#subtopic').empty();
 
-        project_name = $("#project option:selected").text();
-        project_id = $("#project option:selected").val();
+        project_name = $("#project input[name='project']:checked").text();
+        project_id = $("#project input[name='project']:checked").val();
 
         $.getJSON('/_parse_data', {
             a: project_name,
@@ -15,8 +15,7 @@ $(document).ready(function(){
         }, function(data) {
             var options = $("#subtopic");
                 $.each(data, function() {
-                    options.append($("<option \>").val($(this)[0]).text($(this)[1]))
-                    // options.append($("<li><input id='subtopic'-" + $(this)[2] + "' name = 'subtopic' type='checkbox' value=" + $(this)[0] + "><label for='subtopic-" + $(this)[2] + "'>" + $(this)[1] + "</label></li>"
+                    options.append($("<li><input id='subtopic-" + $(this)[2] + "' name = 'subtopic' type='checkbox' value=" + $(this)[0] + "><label for='subtopic-" + $(this)[2] + "'>" + $(this)[1] + "</label></li>"))
 
             });
         });
