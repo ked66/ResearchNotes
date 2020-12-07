@@ -5,9 +5,12 @@ $(document).ready(function(){
     $('#project').on('change', function() {
         event.preventDefault();
         $('#subtopic').empty();
+        project_id = "";
 
         project_name = $("#project input[name='project']:checked").text();
-        project_id = $("#project input[name='project']:checked").val();
+        $("#project input[name='project']:checked").each(function(){
+            project_id = project_id + $(this).val() + ",";
+        });
 
         $.getJSON('/_parse_data', {
             a: project_name,

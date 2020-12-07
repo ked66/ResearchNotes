@@ -608,8 +608,10 @@ def advanced_search():
 @app.route("/_parse_data", methods = ["GET"])
 def parse_data():
     if request.method == "GET":
-        id = request.args.get('b', 0)
+
+        ids = str(request.args.get('b',0)).split(",")
+
         topics = db.session.query(Topics.id, Topics.name, func.row_number().over(order_by=Topics.id)).\
-            filter(Topics.project_id == id).all()
+            filter(Topics.project_id.in_(ids)).all()
 
     return jsonify(topics)
