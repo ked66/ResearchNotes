@@ -51,7 +51,11 @@
             <li>
                 <form action="/delete/note/{{ note[1] }}" method="post" class = "right">
                     <input type="submit" value="Delete Note" />
-                </form><br>
+                </form>
+                <form action="/edit_note/{{ note[1] }}" method="get" class = "right">
+                    <input type = "submit" value = "Edit Note" />
+                </form>
+                <br>
                 {{ note[0] }}
                 <div class = "topic">
                     <ul>
