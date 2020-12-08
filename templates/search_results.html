@@ -13,10 +13,10 @@
         {% for note in notes_sources %}
             {% if note[1] == source %}
                 <li>
-                <form action="/delete/note/{{ note[1] }}" method="post" class = "right">
+                <form action="/delete/note/{{ note[2] }}" method="post" class = "right">
                     <input type="submit" value="Delete Note" />
                 </form>
-                <form action="/edit_note/{{ note[1] }}" method="get" class = "right">
+                <form action="/edit_note/{{ note[2] }}" method="get" class = "right">
                     <input type = "submit" value = "Edit Note" />
                 </form>
                 <br>
