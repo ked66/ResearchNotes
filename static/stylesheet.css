@@ -103,6 +103,9 @@ ul.note li {
 .topic ul li {
     border-style: none;
     box-shadow: none;
+    border-radius: 5px;
+    min-height: 10px;
+    padding-bottom: 5px;
     float: left;
 }
 
