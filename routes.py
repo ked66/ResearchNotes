@@ -640,14 +640,19 @@ def search_results():
 
     if search_form.validate_on_submit():
         search_phrase = "%{}%".format(search_form.text.data)
-        notes_sources = db.session.query(Notes, Sources.citation).join(Sources).\
+        notes_sources = db.session.query(Notes, Sources.citation, Notes.id).join(Sources).\
             filter(Sources.user_id == current_user.get_id()).filter(Notes.note.like(search_phrase)).all()
+        note_ids = [note[2] for note in notes_sources]
+        topics = db.session.query(Topics.name, Topics.id, Topics_Notes.note_id).join(Topics_Notes).\
+            filter(Topics_Notes.note_id.in_(note_ids)).all()
         unique_sources = list(set([item[1] for item in notes_sources]))
 
         return render_template("search_results.html",
                                search = search_form.text.data,
                                sources = unique_sources,
-                               notes_sources = notes_sources)
+                               notes_sources = notes_sources,
+                               topics = topics,
+                               type = "simple")
 
     else:
         return redirect(url_for('projects', user_id=current_user.get_id()))
@@ -712,7 +717,7 @@ def advanced_search_results():
         # get source_ids from sources that meet criteria
         source_ids = [i[0] for i in books.all()] + [j[0] for j in periodicals.all()]
 
-        note_sources = db.session.query(Notes, Sources.citation).\
+        note_sources = db.session.query(Notes, Sources.citation, Notes.id).\
             join(Sources).join(Topics_Notes, isouter=True).filter(Sources.id.in_(source_ids))
 
         if form.subtopic.data:
@@ -724,10 +729,16 @@ def advanced_search_results():
         results = note_sources.all()
         unique_sources = list(set([item[1] for item in results]))
 
+        note_ids = [note[2] for note in note_sources]
+        topics = db.session.query(Topics.name, Topics.id, Topics_Notes.note_id).join(Topics_Notes).\
+            filter(Topics_Notes.note_id.in_(note_ids)).all()
+
         return render_template("search_results.html",
                                search="your specifications",
                                sources=unique_sources,
-                               notes_sources=results)
+                               notes_sources=results,
+                               topics = topics,
+                               type = "advanced")
     else:
         return redirect(url_for('advanced_search'))
 
