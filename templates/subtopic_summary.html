@@ -7,14 +7,31 @@
 
 {% for source in sources %}
 <h3>{{ source.citation|safe }}</h3>
-    <ul>
+    <ul class = "note">
         {% for note in notes %}
             {% if note[1] == source.id %}
-            <li>{{ note[0] }}
-            <form action="/delete/subtopic_note/{{ subtopic.id }}/{{ note[2] }}" method="post">
-                <input type="submit" value="Remove Note from Subtopic" />
-            </form>
-            </li>
+            <li>
+                <form action="/delete/subtopic_note/{{ subtopic.id }}/{{ note[2] }}" method="post" class = "right">
+                    <input type="submit" value="Remove Note from Subtopic" />
+                </form>
+                <form action="/delete/note/{{ note[2] }}" method="post" class = "right">
+                    <input type="submit" value="Delete Note" />
+                </form>
+                <form action="/edit_note/{{ note[2] }}" method="get" class = "right">
+                    <input type = "submit" value = "Edit Note" />
+                </form>
+                <br><br>
+                {{ note[0] }}
+                <div class = "topic">
+                    <ul>
+                        {% for topic in topics %}
+                            {% if topic.note_id == note[2] %}
+                            <li id = 1><a href = "/subtopic/{{topic.id}}">{{ topic.name }}</a></li>
+                            {% endif %}
+                        {% endfor %}
+                    </ul>
+                </div>
+                </li>
             {% endif %}
         {% endfor %}
     </ul>

@@ -325,10 +325,14 @@ def subtopic(subtopic_id):
         source_ids = [id[1] for id in notes]
         sources = db.session.query(Sources).filter(Sources.id.in_(source_ids)).all()
 
+        topics = db.session.query(Topics.name, Topics.id, Topics_Notes.note_id).join(Topics_Notes).\
+            filter(Topics_Notes.note_id.in_(note_ids)).all()
+
         return render_template('subtopic_summary.html',
                                subtopic = subtopic,
                                notes = notes,
-                               sources = sources)
+                               sources = sources,
+                               topics = topics)
 
     else:
         flash("Oops! You aren't authorized to view that page.")
