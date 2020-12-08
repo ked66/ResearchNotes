@@ -6,6 +6,7 @@ p, a, li {
   font-family: 'Roboto', san-serif;
 }
 
+/* Top Navigation Bar */
 .topnav ul {
   list-style-type: none;
   margin: 0;
@@ -70,6 +71,7 @@ ul.dropdown-content li a {
   background-color: #444444;
 }
 
+/* Note Display */
 ul.note {
     list-style-type: none;
     overflow: hidden;
@@ -101,11 +103,14 @@ ul.note li {
 .topic ul li {
     border-style: none;
     box-shadow: none;
-    background: #d623cb;
     float: left;
 }
 
-.topic ul li:hover {
+.topic ul li[id = "1"] {
+    background: #d623cb;
+}
+
+.topic ul li[id = "1"]:hover {
     background: #c01fb6;
 }
 

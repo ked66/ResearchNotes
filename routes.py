@@ -563,6 +563,75 @@ def edit_source_periodical(source_id):
         flash("Oops! You aren't authorized to perform that action.")
         return redirect(url_for('projects', user_id=current_user.get_id()))
 
+@app.route("/edit_note/<note_id>", methods = ["GET", "POST"])
+@login_required
+@get_projects_list
+def edit_note(note_id):
+    user_id = db.session.query(Sources.user_id).join(Notes). \
+        filter(Notes.id == note_id).scalar()
+
+    if int(current_user.get_id()) == user_id:
+        note = db.session.query(Notes.note, Notes.first_page, Notes.last_page).filter(Notes.id == note_id).all()
+        topics = db.session.query(Topics_Notes.topic_id).filter(Topics_Notes.note_id == note_id).all()
+        topic_ids = [topic[0] for topic in topics]
+        source_id = db.session.query(Sources.id).join(Notes).filter(Notes.id == note_id).scalar()
+        project_id = db.session.query(Source_Project.project_id).join(Sources).join(Notes).\
+            filter(Notes.id == note_id).scalar()
+
+        # initialize form
+        form = NoteForm()
+        form.topic.choices = [(None, "None")] + db.session.query(Topics.id, Topics.name). \
+            filter(Topics.project_id == project_id).all()
+
+        # set defaults
+        form.note.default = note[0][0]
+        form.first_page.default = note[0][1]
+        form.last_page.default = note[0][2]
+        form.topic.default = topic_ids
+
+        # change submit button label
+        form.submit.label.text = "Save Changes"
+
+        # save changes
+        form.process()
+
+        if request.method == "POST":
+            form = NoteForm()
+
+            db.session.query(Notes).filter(Notes.id == note_id).update({
+                Notes.note: form.note.data,
+                Notes.first_page: form.first_page.data,
+                Notes.last_page: form.last_page.data
+            })
+            db.session.commit()
+
+            if form.topic.data:
+                for topic in form.topic.data:
+                    # add new topics
+                    if topic not in topic_ids:
+                        new_topic_note = Topics_Notes(note_id=note_id,
+                                                      topic_id=topic)
+                        db.session.add(new_topic_note)
+                        db.session.commit()
+                # remove removed topics
+                for id in topic_ids:
+                    if id not in form.topic.data:
+                        to_delete = db.session.query(Topics_Notes).filter(Topics_Notes.topic_id == id).first()
+                        db.session.delete(to_delete)
+                        db.session.commit()
+
+            flash("Note Updated!")
+            return redirect(url_for("source", source_id = source_id))
+
+        return render_template("edit_note.html", form = form)
+
+    else:
+        flash("Oops! You aren't authorized to perform that action!")
+        return redirect(url_for("projects", user_id = current_user.get_id()))
+
+
+
+
 @app.route("/search_results", methods=["GET", "POST"])
 @login_required
 @get_projects_list
@@ -662,13 +731,7 @@ def advanced_search_results():
     else:
         return redirect(url_for('advanced_search'))
 
-        # narrow by project
-        #project_ids = form.project.data
-        # narrow by source
-        #source_ids = db.session.query(Sources.id).filter(Sources.source_type.in_(form.source_type.data))
-        # narrow by subtopic
-        # narrow by note text search
-
+# for advanced search page -- to display subtopics for selected project(s)
 @app.route("/_parse_data", methods = ["GET"])
 def parse_data():
     if request.method == "GET":
