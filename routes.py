@@ -634,7 +634,7 @@ def edit_note(note_id):
         flash("Oops! You aren't authorized to perform that action!")
         return redirect(url_for("projects", user_id = current_user.get_id()))
 
-@app.route("/edit_subtopc/<subtopic_id>", methods = ["GET", "POST"])
+@app.route("/edit_subtopic/<subtopic_id>", methods = ["GET", "POST"])
 @login_required
 @get_projects_list
 def edit_subtopic(subtopic_id):
@@ -642,8 +642,32 @@ def edit_subtopic(subtopic_id):
         filter(Topics.id == subtopic_id).scalar()
 
     if int(current_user.get_id()) == user_id:
+        topic = db.session.query(Topics.name, Topics.color, Topics.project_id).\
+            filter(Topics.id == subtopic_id).first()
+
         form = SubtopicForm()
-        
+
+        form.name.default = topic.name
+        form.color.default = topic.color
+
+        form.submit.label.text = "Save Changes"
+
+        form.process()
+
+        if request.method == "POST":
+            form = SubtopicForm()
+
+            db.session.query(Topics).filter(Topics.id == subtopic_id).update({
+                Topics.name: form.name.data,
+                Topics.color: form.color.data
+            })
+
+            db.session.commit()
+
+            flash("Subtopic Updated!")
+            return redirect(url_for("project", project_id = topic.project_id))
+
+        return render_template("edit_subtopic.html", form = form)
 
     else:
         flash("Oops! You aren't authorized to perform that action!")

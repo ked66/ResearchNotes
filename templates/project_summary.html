@@ -22,9 +22,7 @@
         <ul>
             {% for subtopic in subtopics %}
             <li id = "{{subtopic.color}}"><a href="/subtopic/{{subtopic.id}}">{{ subtopic.name }}</a>
-                <form action="/delete/subtopic/{{ subtopic.id }}" method="post">
-                    <input type="submit" value="Delete Subtopic" />
-                </form>
+
             </li>
             {% endfor %}
         </ul>

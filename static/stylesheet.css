@@ -252,3 +252,14 @@ ul[id = "color"] li label[for="color-5"]{
 ul[id = "color"] li label[for="color-5"]:hover{
     background: #89E2C7;
 }
+
+/* buttons */
+ul.buttons {
+    list-style-type: none;
+    float: left;
+    padding-left: 0px;
+}
+
+ul.buttons li {
+    float: left;
+}

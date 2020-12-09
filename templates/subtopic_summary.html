@@ -3,7 +3,19 @@
 {% block content %}
 
 <h2>{{ subtopic.name }}</h2>
-<p>{{ subtopic.description }}</p>
+<ul class = "buttons">
+    <li>
+        <form action="/edit_subtopic/{{ subtopic.id }}" method="get">
+            <input type = "submit" value = "Edit Subtopic" title = "Change Name and/or Tag Color"/>
+        </form>
+    </li>
+    <li>
+        <form action="/delete/subtopic/{{ subtopic.id }}" method="post">
+            <input type="submit" value="Delete Subtopic" />
+        </form>
+    </li>
+</ul>
+<br><br>
 
 {% for source in sources %}
 <h3>{{ source.citation|safe }}</h3>
