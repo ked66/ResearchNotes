@@ -31,8 +31,6 @@ Displays notes associated with subtopic, sorted by source
 ### Note Search
 Allows user to search & sort notes
 
-*under construction*
-
 ## To-Do:
 - Add user sign-in :white_check_mark:
     - 2 Dec. 2020: All pages besides homepage require login, and users can only edit their own projects/sources/notes, etc. 
@@ -42,6 +40,7 @@ Allows user to search & sort notes
 - Expand supported source types
 - Add CSS formatting
     - 3 Dec. 2020: Added top Navigation Bar, added font styles "Sniglet" and "Roboto"
+    - 9 Dec. 2020: Added extensive styling of notes and topic labels (including option to choose color of label)
 
 ## Built Using
 - [Flask](https://flask.palletsprojects.com/en/1.1.x/#): web framework that wraps [Werkzeug](https://werkzeug.palletsprojects.com/), a unicode web application library, and [Jinja](http://jinja.pocoo.org/docs), a web templating language for python
