@@ -26,7 +26,7 @@
                     <ul>
                         {% for topic in topics %}
                             {% if topic.note_id == note[2] %}
-                            <li id = 1><a href = "/subtopic/{{topic.id}}">{{ topic.name }}</a></li>
+                            <li id = {{ topic.color }}><a href = "/subtopic/{{topic.id}}">{{ topic.name }}</a></li>
                             {% endif %}
                         {% endfor %}
                     </ul>

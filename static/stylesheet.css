@@ -105,16 +105,70 @@ ul.note li {
     box-shadow: none;
     border-radius: 5px;
     min-height: 10px;
-    padding-bottom: 5px;
+    padding: 5px;
+    margin: 5px;
     float: left;
+    position: relative;
 }
 
+div.topic[id = "project_summary"] ul {
+    position: relative;
+    overflow: visible;
+}
+
+/* tag colors */
+/* 1 - Blue */
 .topic ul li[id = "1"] {
-    background: #d623cb;
+    background: #0C76B4;
 }
 
 .topic ul li[id = "1"]:hover {
+    background: #2832C2;
+}
+
+/* 2 - Green */
+.topic ul li[id = "2"]{
+    background: #028A0F; /* "emerald" */
+}
+
+.topic ul li[id = "2"]:hover{
+    background: #32612D; /* "basil" */
+}
+
+/* 3 - Red */
+.topic ul li[id = "3"]{
+    background: #A91B0D; /* "apple" */
+}
+
+.topic ul li[id = "3"]:hover{
+    background: #900603; /* "ruby" */
+}
+
+/* 4 - Gold */
+.topic ul li[id = "4"]{
+    background: #CFB53B; /* "old gold */
+}
+
+.topic ul li[id = "4"]:hover{
+    background: #D7BE69;
+}
+
+/* 5 - Orchid */
+.topic ul li[id = "5"]{
+    background: #d623cb;
+}
+
+.topic ul li[id = "5"]:hover{
     background: #c01fb6;
+}
+
+/* 6 - Aqua */
+.topic ul li[id = "6"]{
+    background: #5AC6AC;
+}
+
+.topic ul li[id = "6"]:hover{
+    background: #89E2C7;
 }
 
 .topic ul li a {
@@ -125,4 +179,76 @@ ul.note li {
 ul.note .right {
     float: right;
     overflow: hidden;
+}
+
+/* color choices for topics form */
+ul[id = "color"] {
+    list-style-type: none;
+    padding-left: 0px;
+    display: inline-block;
+}
+
+ul[id = "color"] li {
+    float: left;
+    display: inline-block;
+    text-align: center;
+}
+
+ul[id = "color"] li label {
+    display: block;
+    min-width: 50px;
+    min-height: 20px;
+    padding: 5px;
+    margin: 5px;
+    border-radius: 5px;
+    text-align: center;
+    color: white;
+}
+
+ul[id = "color"] li label[for="color-0"]{
+    background: #0C76B4;
+}
+
+ul[id = "color"] li label[for="color-0"]:hover{
+    background: #2832C2;
+}
+
+ul[id = "color"] li label[for="color-1"]{
+    background: #028A0F; /* "emerald" */
+}
+
+ul[id = "color"] li label[for="color-1"]:hover{
+    background: #32612D; /* "basil" */
+}
+
+ul[id = "color"] li label[for="color-2"]{
+    background: #A91B0D; /* "apple" */
+}
+
+ul[id = "color"] li label[for="color-2"]:hover{
+    background: #900603; /* "ruby" */
+}
+
+ul[id = "color"] li label[for="color-3"]{
+    background: #CFB53B; /* "old gold */
+}
+
+ul[id = "color"] li label[for="color-3"]:hover{
+    background: #D7BE69;
+}
+
+ul[id = "color"] li label[for="color-4"]{
+    background: #d623cb;
+}
+
+ul[id = "color"] li label[for="color-4"]:hover{
+    background: #c01fb6;
+}
+
+ul[id = "color"] li label[for="color-5"]{
+    background: #5AC6AC;
+}
+
+ul[id = "color"] li label[for="color-5"]:hover{
+    background: #89E2C7;
 }

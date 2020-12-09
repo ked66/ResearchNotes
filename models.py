@@ -102,6 +102,7 @@ class Topics(db.Model):
     id = db.Column(db.Integer, primary_key = True)
     name = db.Column(db.String(50))
     project_id = db.Column(db.Integer, db.ForeignKey('projects.id'))
+    color = db.Column(db.Integer)
     topics_notes = db.relationship('Topics_Notes', cascade='all,delete-orphan')
     sqlite_autoincrement = True
 

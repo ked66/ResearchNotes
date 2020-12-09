@@ -121,7 +121,8 @@ def project(project_id):
         # form to add subtopic
         if request.method == "POST" and form.validate():
             new_subtopic = Topics(name = form.name.data,
-                                project_id = project_id)
+                                  project_id = project_id,
+                                  color = form.color.data)
             db.session.add(new_subtopic)
             db.session.commit()
 
@@ -294,7 +295,7 @@ def source(source_id):
         notes = db.session.query(Notes, Notes.id).filter(Notes.source_id == source_id).order_by(Notes.first_page)
         note_ids = [note[1] for note in notes]
 
-        topics = db.session.query(Topics.name, Topics.id, Topics_Notes.note_id).join(Topics_Notes).\
+        topics = db.session.query(Topics.name, Topics.id, Topics_Notes.note_id, Topics.color).join(Topics_Notes).\
             filter(Topics_Notes.note_id.in_(note_ids)).all()
 
         return render_template('source_summary.html',
@@ -325,7 +326,7 @@ def subtopic(subtopic_id):
         source_ids = [id[1] for id in notes]
         sources = db.session.query(Sources).filter(Sources.id.in_(source_ids)).all()
 
-        topics = db.session.query(Topics.name, Topics.id, Topics_Notes.note_id).join(Topics_Notes).\
+        topics = db.session.query(Topics.name, Topics.id, Topics_Notes.note_id, Topics.color).join(Topics_Notes).\
             filter(Topics_Notes.note_id.in_(note_ids)).all()
 
         return render_template('subtopic_summary.html',
@@ -633,8 +634,20 @@ def edit_note(note_id):
         flash("Oops! You aren't authorized to perform that action!")
         return redirect(url_for("projects", user_id = current_user.get_id()))
 
+@app.route("/edit_subtopc/<subtopic_id>", methods = ["GET", "POST"])
+@login_required
+@get_projects_list
+def edit_subtopic(subtopic_id):
+    user_id = db.session.query(Projects.user_id).join(Topics). \
+        filter(Topics.id == subtopic_id).scalar()
 
+    if int(current_user.get_id()) == user_id:
+        form = SubtopicForm()
+        
 
+    else:
+        flash("Oops! You aren't authorized to perform that action!")
+        return redirect(url_for("projects", user_id = current_user.get_id()))
 
 @app.route("/search_results", methods=["GET", "POST"])
 @login_required

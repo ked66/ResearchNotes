@@ -1,6 +1,6 @@
 from flask_wtf import FlaskForm
 from wtforms import StringField, IntegerField, SubmitField, SelectField, SelectMultipleField, PasswordField,\
-    TextAreaField, validators, widgets
+    TextAreaField, validators, widgets, RadioField
 from models import Projects, Topics
 from app import db
 
@@ -99,6 +99,9 @@ class PeriodicalForm(FlaskForm):
 ## form to add subtopic
 class SubtopicForm(FlaskForm):
     name = StringField(label = "Give your Subtopic a Name: ")
+    color = RadioField(label = "Choose a color for its tag: ",
+                       choices = [(1, "Blue"), (2, "Green"), (3, "Red"), (4, "Gold"),
+                                  (5, "Orchid"), (6, "Aqua")])
     submit = SubmitField(label = "Add Subtopic")
 
 ## form to add note
