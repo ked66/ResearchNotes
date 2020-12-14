@@ -684,7 +684,7 @@ def search_results():
         notes_sources = db.session.query(Notes, Sources.citation, Notes.id).join(Sources).\
             filter(Sources.user_id == current_user.get_id()).filter(Notes.note.like(search_phrase)).all()
         note_ids = [note[2] for note in notes_sources]
-        topics = db.session.query(Topics.name, Topics.id, Topics_Notes.note_id).join(Topics_Notes).\
+        topics = db.session.query(Topics.name, Topics.id, Topics_Notes.note_id, Topics.color).join(Topics_Notes).\
             filter(Topics_Notes.note_id.in_(note_ids)).all()
         unique_sources = list(set([item[1] for item in notes_sources]))
 
@@ -762,7 +762,16 @@ def advanced_search_results():
             join(Sources).join(Topics_Notes, isouter=True).filter(Sources.id.in_(source_ids))
 
         if form.subtopic.data:
-            note_sources = note_sources.filter(Topics_Notes.topic_id.in_(form.subtopic.data))
+
+            # "or" search
+            # note_sources = note_sources.filter(Topics_Notes.topic_id.in_(form.subtopic.data))
+
+            # "and" search
+            for topic in form.subtopic.data:
+                note_ids = note_sources.filter(Topics_Notes.topic_id == topic).all()
+                note_ids = [note.id for note in note_ids]
+                note_sources = note_sources.filter(Notes.id.in_(note_ids))
+
 
         if form.note_text.data:
             note_sources = note_sources.filter(Notes.note.like(note_phrase))
@@ -771,7 +780,7 @@ def advanced_search_results():
         unique_sources = list(set([item[1] for item in results]))
 
         note_ids = [note[2] for note in note_sources]
-        topics = db.session.query(Topics.name, Topics.id, Topics_Notes.note_id).join(Topics_Notes).\
+        topics = db.session.query(Topics.name, Topics.id, Topics.color, Topics_Notes.note_id).join(Topics_Notes).\
             filter(Topics_Notes.note_id.in_(note_ids)).all()
 
         return render_template("search_results.html",
