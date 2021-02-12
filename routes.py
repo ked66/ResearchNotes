@@ -706,7 +706,7 @@ def advanced_search():
     form.source_type.choices = db.session.query(Sources.source_type, Sources.source_type).\
         filter(Sources.user_id == current_user.get_id()).distinct().all()
     form.project.choices = db.session.query(Projects.id, Projects.name).\
-        filter(Sources.user_id == current_user.get_id()).distinct().all()
+        filter(Projects.user_id == current_user.get_id()).distinct().all()
 
     form.subtopic.choices = [(None, "None")]
 
